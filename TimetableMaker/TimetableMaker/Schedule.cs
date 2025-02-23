@@ -199,13 +199,13 @@ namespace TimetableMaker
             int dayHours = DAY_HOURS;
             int nrRooms = configuration.Rooms.Count;
             int nrStudentGroups = configuration.StudentGroups.Count;
-            float score = 0.0f;
+            float score = (dayNum * dayHours * nrRooms);
             //List<List<List<int>>> dayRoomsHoursList = new List<List<List<int>>>();
 
-            if (nrRooms >= nrStudentGroups)
-            {
-                score += 1.0f;
-            }
+            //if (nrRooms >= nrStudentGroups)
+            //{
+             //   score += 1.0f;
+            //}
 
             Dictionary<(int day, int hour), List<CourseClass>> schedule=OrganizeChromosome(chromosome,dayNum,dayHours,nrRooms);
             for(int i = 0;i<dayNum;i++)
@@ -213,14 +213,14 @@ namespace TimetableMaker
                 for(int j = 0;j<dayHours;j++)
                 {
                     int result=CompareLabs(schedule, i, j);
-                    if(result != -1)
-                    {
+                    //if(result != -1)
+                    //{
                         score+=result;
-                    }
+                    //}
                 }
             }
 
-            return (score/(dayNum*dayHours))*100.0f;
+            return (score/(dayNum*dayHours*nrRooms))*100.0f;
         }
 
         public Dictionary<(int day, int hour), List<CourseClass>> OrganizeChromosome(
@@ -263,7 +263,7 @@ namespace TimetableMaker
             if (!schedule.ContainsKey((day, hour)))
             {
                 Console.WriteLine($"Nu există laboratoare la ziua {day}, ora {hour}");
-                return -1;
+                return 0;
             }
             int score = 0;
             var labs = schedule[(day, hour)];
@@ -272,14 +272,14 @@ namespace TimetableMaker
                 for (int j = i + 1; j < labs.Count; j++)
                 {
                     //Console.WriteLine($"Compar laboratorul {labs[i].Course} cu {labs[j].Course}");
-                    if (labs[i].Professor== labs[j].Professor || labs[i].Group == labs[j].Group)
+                    if (labs[i].Professor.Name == labs[j].Professor.Name || labs[i].Group.Name == labs[j].Group.Name)
                     {
                         score--;
                     }
-                    else
-                    {
-                        score++;
-                    }
+                    //else
+                    //{
+                    //    score++;
+                    //}
                 }
             }
             return score;

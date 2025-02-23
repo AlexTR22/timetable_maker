@@ -48,7 +48,7 @@ namespace TimetableMaker
             }
 
 
-            for (int generation = 1; generation <= 10; generation++)
+            for (int generation = 1; generation <= 100; generation++)
             {
                 PriorityQueue<Chromosome, float> populationQueue= new PriorityQueue<Chromosome, float>();
 
@@ -61,7 +61,7 @@ namespace TimetableMaker
                 {
                     Chromosome parent1 = Population[i];
                     Chromosome parent2 = Population[(i + 1) % NrChromosomes]; 
-
+                   
                     var offsprings= schedule.CrossoverFunction(parent1, parent2);
                     Chromosome offspring1= offsprings.Item1;
                     Chromosome offspring2 = offsprings.Item2;
@@ -80,10 +80,17 @@ namespace TimetableMaker
                 {
                     Population.Add(populationQueue.Dequeue());
                 }
+
+                //Random rand = new Random();
+               // for (int i = Population.Count - 1; i > 0; i--)
+                //{
+                 //   int j = rand.Next(i + 1);
+                //    (Population[i], Population[j]) = (Population[j], Population[i]);
+               // }
             }
 
             Console.WriteLine(Population[0].Fitness);
-            Population[0].WriteSelf();
+            Population[0].WriteSelf(config);
         }
 
         public Chromosome GetBestChromosome()
