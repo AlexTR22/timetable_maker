@@ -3,26 +3,26 @@ using TimetableBackend.Model;
 using TimetableBackend.Service;
 
 namespace TimetableBackend.Controllers
-{ 
+{
     [ApiController]
     [Route("[controller]")]
-    public class ProfessorController: ControllerBase
+    public class RoomController : ControllerBase
     {
-        public ProfessorServicecs _professorService;
+        public RoomService _roomsService;
 
-        public ProfessorController()
+        public RoomController(RoomService roomService)
         {
-            _professorService = new ProfessorServicecs();
+            _roomsService = roomService;
         }
 
         [HttpGet]
         [ProducesResponseType(200)]
         public async Task<IActionResult> GetAllEvents()
         {
-            List<Professor> professors = _professorService.GetAllProfessors();
-            return Ok(professors);
+            List<Room> rooms = _roomsService.GetAllRooms();
+            return Ok(rooms);
         }
-
-
     }
+
+
 }

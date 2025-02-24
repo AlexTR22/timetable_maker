@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 //database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (connectionString != null)
+if (connectionString == null)
 {
     Console.Error.WriteLine("No database connection string found");
 }
@@ -12,6 +12,8 @@ else
 {
     builder.Services.AddSingleton(new Helper(connectionString));
 }
+builder.Services.AddScoped<RoomService>();
+
 // Add services to the container.
 
 builder.Services.AddControllers();

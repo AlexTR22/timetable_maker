@@ -7,27 +7,29 @@ namespace TimetableBackend.Service
     public class RoomService
     {
         private readonly Helper _helper;
+        public RoomService(Helper helper)
+        {
+            _helper = helper ?? throw new ArgumentNullException(nameof(helper));
+        }
 
-
-        public List<Professor> GetAllRooms()
+        public List<Room> GetAllRooms()
         {
             SqlConnection con = _helper.Connection;
             try
             {
                 SqlCommand cmd = new SqlCommand("GetAllRooms", con);
-                List<Professor> result = new List<Professor>();
+                List<Room> result = new List<Room>();
                 cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    Professor professor = new Professor();
-                    professor.Id = (int)reader[0];
-                    professor.Name = reader.GetString(1);
-                    result.Add(professor);
+                    Room room = new Room();
+                    room.Id = (int)reader[0];
+                    room.Name = reader.GetString(1);
+                    result.Add(room);
                 }
                 reader.Close();
-                //ProfessorList = result;
                 return result;
             }
             finally
@@ -36,13 +38,13 @@ namespace TimetableBackend.Service
             }
         }
 
-        public List<Professor> GetAllRoomsByUniversity(string uniName)
+        public List<Room> GetAllRoomsByUniversity(string uniName)
         {
             SqlConnection con = _helper.Connection;
             try
             {
                 SqlCommand cmd = new SqlCommand("GetAllRoomsByUni", con);
-                List<Professor> result = new List<Professor>();
+                List<Room> result = new List<Room>();
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlParameter name = new SqlParameter("@name", uniName);
                 cmd.Parameters.Add(name);
@@ -50,13 +52,12 @@ namespace TimetableBackend.Service
                 SqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    Professor professor = new Professor();
-                    professor.Id = (int)reader[0];
-                    professor.Name = reader.GetString(1);
-                    result.Add(professor);
+                    Room room = new Room();
+                    room.Id = (int)reader[0];
+                    room.Name = reader.GetString(1);
+                    result.Add(room);
                 }
                 reader.Close();
-                //ProfessorList = result;
                 return result;
             }
             finally
@@ -71,16 +72,19 @@ namespace TimetableBackend.Service
             try
             {
                 SqlCommand cmd = new SqlCommand("AddRoom", con);
-                List<Professor> result = new List<Professor>();
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 SqlParameter id = new SqlParameter("@id", SqlDbType.Int);
-                id.Direction = ParameterDirection.Output;
                 SqlParameter name = new SqlParameter("@name", room.Name);
+
+                id.Direction = ParameterDirection.Output;
+
                 cmd.Parameters.Add(id);
                 cmd.Parameters.Add(name);
+
                 con.Open();
                 cmd.ExecuteNonQuery();
+
                 room.Id = (int)id.Value;
             }
             finally

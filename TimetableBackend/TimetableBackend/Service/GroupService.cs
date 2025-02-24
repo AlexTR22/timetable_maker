@@ -1,32 +1,32 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Data.SqlClient;
 using System.Data;
-using System.Data.SqlClient;
 using TimetableBackend.Model;
 
 namespace TimetableBackend.Service
 {
-    public class ProfessorServicecs
+    public class GroupService
     {
         private readonly Helper _helper;
 
-        public List<Professor> GetAllProfessors()
+
+        public List<Group> GetAllGorups()
         {
             SqlConnection con = _helper.Connection;
             try
             {
-                List<Professor> result = new List<Professor>();
-                SqlCommand cmd = new SqlCommand("GetAllProfessor", con);
+                List<Group> result = new List<Group>();
+                SqlCommand cmd = new SqlCommand("GetAllCourses", con);
 
                 cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
-                 
+
                 SqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    Professor professor = new Professor();
-                    professor.Id = (int)reader[0];
-                    professor.Name= reader.GetString(1);
-                    result.Add(professor);
+                    Group group = new Group();
+                    group.Id = (int)reader[0];
+                    group.Name = reader.GetString(1);
+                    result.Add(group);
                 }
                 reader.Close();
                 return result;
@@ -37,31 +37,28 @@ namespace TimetableBackend.Service
             }
         }
 
-        public List<Professor> GetAllProfessorsByUniversity(string uniName)
+        public List<Group> GetAllGorupsByUniversity(string uniName)
         {
             SqlConnection con = _helper.Connection;
             try
             {
-                List<Professor> result = new List<Professor>();
+                List<Group> result = new List<Group>();
+                SqlCommand cmd = new SqlCommand("GetAllRoomsByUni", con);
 
-                SqlCommand cmd = new SqlCommand("GetAllProfessorsByUni", con);
                 cmd.CommandType = CommandType.StoredProcedure;
-
                 SqlParameter name = new SqlParameter("@name", uniName);
-                 
+
                 cmd.Parameters.Add(name);
                 con.Open();
-
                 SqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    Professor professor = new Professor();
-                    professor.Id = (int)reader[0];
-                    professor.Name = reader.GetString(1);
-                    result.Add(professor);
+                    Group group = new Group();
+                    group.Id = (int)reader[0];
+                    group.Name = reader.GetString(1);
+                    result.Add(group);
                 }
                 reader.Close();
-                
                 return result;
             }
             finally
@@ -70,25 +67,23 @@ namespace TimetableBackend.Service
             }
         }
 
-        public void AddProfessorInDatabase(Professor professor)
+        public void AddGorupInDatabase(Group group)
         {
             SqlConnection con = _helper.Connection;
             try
             {
-                SqlCommand cmd = new SqlCommand("AddProfessor", con);
+                SqlCommand cmd = new SqlCommand("AddRoom", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 SqlParameter id = new SqlParameter("@id", SqlDbType.Int);
-                SqlParameter name = new SqlParameter("@name", professor.Name);
+                SqlParameter name = new SqlParameter("@name", group.Name);
                 id.Direction = ParameterDirection.Output;
 
                 cmd.Parameters.Add(id);
                 cmd.Parameters.Add(name);
-
                 con.Open();
                 cmd.ExecuteNonQuery();
-
-                professor.Id = (int)id.Value;
+                group.Id = (int)id.Value;
             }
             finally
             {
@@ -96,16 +91,16 @@ namespace TimetableBackend.Service
             }
         }
 
-        public void ModifyProfessorInDatabase(Professor professor)
+        public void ModifyGroupInDatabase(Group group)
         {
             SqlConnection con = _helper.Connection;
             try
             {
-                SqlCommand cmd = new SqlCommand("ModifyProfessor", con);
+                SqlCommand cmd = new SqlCommand("ModifyRoom", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                SqlParameter id = new SqlParameter("@id", professor.Id);
-                SqlParameter name = new SqlParameter("@name", professor.Name);
+                SqlParameter id = new SqlParameter("@id", group.Id);
+                SqlParameter name = new SqlParameter("@name", group.Name);
 
                 cmd.Parameters.Add(id);
                 cmd.Parameters.Add(name);
@@ -118,15 +113,15 @@ namespace TimetableBackend.Service
             }
         }
 
-        public void DeleteProfessorInDatabase(int professorId)
+        public void DeleteGroupInDatabase(int groupId)
         {
             SqlConnection con = _helper.Connection;
             try
             {
-                SqlCommand cmd = new SqlCommand("DeleteProfessor", con);
+                SqlCommand cmd = new SqlCommand("DeleteRoom", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                SqlParameter id= new SqlParameter("@id", professorId);
+                SqlParameter id = new SqlParameter("@id", groupId);
                 cmd.Parameters.Add(id);
                 con.Open();
                 cmd.ExecuteNonQuery();
@@ -136,7 +131,5 @@ namespace TimetableBackend.Service
                 con.Close();
             }
         }
-
-
     }
 }
