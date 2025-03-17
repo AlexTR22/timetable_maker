@@ -1,4 +1,5 @@
-﻿using TimetableBackend.Model;
+﻿using System.Collections.Generic;
+using TimetableBackend.Model;
 
 namespace TimetableBackend.Service
 {
@@ -11,10 +12,13 @@ namespace TimetableBackend.Service
         private int Generations { get; set; }
         private int NrChromosomes{ get; set; }
         private int ChromosomeSize { get; set; }
-        private const int DAYS= 5;
-        private const int HOUURS = 6;
-        private int RoomsNumber { get; set; }
         private int MutationProbability {  get; set; }
+
+        private const int DAYS= 5;
+        private const int HOURS = 6;
+        
+        //private int RoomsNumber { get; set; }
+        private List<Room> _rooms;
 
         ChromosomeService ChromosomeService { get; set; }
 
@@ -26,35 +30,58 @@ namespace TimetableBackend.Service
             MutationProbability = 3;
             ChromosomeService = new ChromosomeService(universityName);
 
+            _rooms = new List<Room>();
+            _rooms= ChromosomeService.GetRoomsByUniversity();
 
             if (_population.Count == 0)
             {
                 Chromosome c = ChromosomeService.GetCourseClaseesByUniversity();
                 _population.Add(c);
             }
-            for (int it = 1; it < NrChromosomes; it++)
-            {
-                _population.Add(_population[0]);
-            }
+
+            //initializarea asta de la populatie pot sa o fac si in algoritmul propriu zis, pentru ca nu are legatura in mod special cu constructorul
+            //for (int it = 1; it < NrChromosomes; it++)
+            //{
+            //    _population.Add(_population[0]);
+            //}
         }
 
 
         public Chromosome Run()
         {
-
-            aici o sa trebuiasca sa se puna zi ora si sala pentru fiecare cromozom. Adica sa se initializeze cromozomii cu valori random.
-
-
-            foreach (Chromosome c in _population)
-            { 
-                c.Fitness =  CalculateFitness(c);
+            //initialize population
+            for (int it = 1; it < NrChromosomes; it++)
+            {
+                _population.Add(_population[0]);
             }
+            Random rng = new Random();
+            for (int i = 0; i < NrChromosomes; i++)
+            { 
+                for(int j = 0; j < _population[i].Genes.Count;j++)
+                {
+                    _population[i].Genes[j].Room=_rooms[rng.Next(_rooms.Count)];
+                    _population[i].Genes[j].Day= rng.Next(DAYS);
+                    _population[i].Genes[j].Hour= rng.Next(HOURS);
+                }
+            }
+            //aici o sa trebuiasca sa se puna zi ora si sala pentru fiecare cromozom. Adica sa se initializeze cromozomii cu valori random.
+
+
+            //foreach (Chromosome c in _population)
+            //{ 
+            //    c.Fitness =  CalculateFitness(c);
+            //}
             
             //aici o sa incerc sa fac sa iau primii cei mai buni 2 cromozomii si sa le fac crossover, de asemenea functia de crossover aici o
             //sa imparta cromozomul in 3 parti egale si apoi pentru urmatoarea generatie o sa ie ia aleatoriu segmente din cei 2 cromozomi parinti
             // de asemenea crossover o sa returneze o lista de cromozomi care reprezinta noua generatie
             for (int generation = 1; generation <= 100; generation++)
             {
+                foreach (Chromosome c in _population)
+                {
+                    c.Fitness = CalculateFitness(c);
+                }
+
                 _population.Sort((a, b) => b.Fitness.CompareTo(a.Fitness));
 
                 Chromosome parent1 = _population[0];
@@ -68,64 +95,13 @@ namespace TimetableBackend.Service
                     MutationFunction(_population[i]);
                 }
 
-                foreach (Chromosome c in _population)
-                {
-                    c.Fitness = CalculateFitness(c);
-                }
+                
 
-
-                //if (generation > 10 && IsConverged(population))
-                //{
-                //    Console.WriteLine($"Converged at generation {generation}");
-                //    break;
-                //}
+            
             }
 
 
 
-            // deci aici iau toti membrii generatiei si le fac crossover
-            //for (int generation = 1; generation <= 100; generation++)
-            //{
-            //    List<Chromosome> newPopulation = new List<Chromosome>(NrChromosomes * 3); 
-
-
-            //    for (int i = 0; i < NrChromosomes; i++)
-            //    {
-            //        Chromosome parent1 = population[i];
-            //        Chromosome parent2 = population[(i + 1) % NrChromosomes];
-
-
-            //        var (offspring1, offspring2) = CrossoverFunction(parent1, parent2);
-
-            //        MutationFunction(offspring1);
-            //        MutationFunction(offspring2);
-
-
-            //        offspring1.Fitness = CalculateFitness(offspring1);
-            //        offspring2.Fitness = CalculateFitness(offspring2);
-
-            //        newPopulation.Add(parent1);
-            //        newPopulation.Add(offspring1);
-            //        newPopulation.Add(offspring2);
-            //    }
-
-
-            //    newPopulation.Sort((a, b) => b.Fitness.CompareTo(a.Fitness));
-
-
-            //    population.Clear();
-            //    for (int i = 0; i < NrChromosomes; i++)
-            //    {
-            //        population.Add(newPopulation[i]);
-            //    }
-
-
-            //    if (generation > 10 && IsConverged(population))
-            //    {
-            //        Console.WriteLine($"Converged at generation {generation}");
-            //        break;
-            //    }
-            //}
             return _population[0];
         }
 
@@ -176,49 +152,39 @@ namespace TimetableBackend.Service
             Random rng = new Random();
             List<Chromosome> newPopulation = new List<Chromosome>();
 
+                       // aici o sa trebuiasca sa schimb chestiile care sunt puse random (sala, ora, zi)
             for (int i = 0; i < NrChromosomes; i++)
             {
                 Chromosome newChromosome = new Chromosome();
-                for (int j = 0; i < 3; j++)
+
+                for (int j = 0; j < 3; j++)
                 {
-                    if (i == 0)
+                    int aux = rng.Next(0, 2); // Alegem între parent1 și parent2
+                    List<CourseClass> selectedGenes;
+
+                    if (j == 0)
                     {
-                        int aux = rng.Next(0, 2);
-                        if (aux == 0)
-                        {
-                            newChromosome.Genes = parent1.Genes.GetRange(0, firstSplitPos);
-                        }
-                        else
-                        {
-                            newChromosome.Genes = parent2.Genes.GetRange(0, firstSplitPos);
-                        }
+                        selectedGenes = (aux == 0)
+                            ? parent1.Genes.GetRange(0, firstSplitPos)
+                            : parent2.Genes.GetRange(0, firstSplitPos);
                     }
-                    if (i == 1)
+                    else if (j == 1)
                     {
-                        int aux = rng.Next(0, 2);
-                        if (aux == 0)
-                        {
-                            newChromosome.Genes = parent1.Genes.GetRange(firstSplitPos, secondSplitPos-firstSplitPos+1);
-                        }
-                        else
-                        {
-                            newChromosome.Genes = parent2.Genes.GetRange(firstSplitPos, secondSplitPos - firstSplitPos + 1);
-                        }
+                        selectedGenes = (aux == 0)
+                            ? parent1.Genes.GetRange(firstSplitPos, secondSplitPos - firstSplitPos + 1)
+                            : parent2.Genes.GetRange(firstSplitPos, secondSplitPos - firstSplitPos + 1);
                     }
-                    if (i == 2)
+                    else
                     {
-                        int aux = rng.Next(0, 2);
-                        if (aux == 0)
-                        {
-                            newChromosome.Genes = parent1.Genes.GetRange(secondSplitPos, parent1.Genes.Count-secondSplitPos);
-                        }
-                        else
-                        {
-                            newChromosome.Genes = parent2.Genes.GetRange(firstSplitPos, parent2.Genes.Count - secondSplitPos);
-                        }
+                        selectedGenes = (aux == 0)
+                            ? parent1.Genes.GetRange(secondSplitPos, parent1.Genes.Count - secondSplitPos)
+                            : parent2.Genes.GetRange(secondSplitPos, parent2.Genes.Count - secondSplitPos);
                     }
+
+                    newChromosome.Genes.AddRange(selectedGenes);
                 }
 
+              
                 newPopulation.Add(newChromosome);
             }
             return newPopulation;
@@ -227,16 +193,15 @@ namespace TimetableBackend.Service
         public Chromosome MutationFunction(Chromosome chromosome)
         {
        
-            Random rnd = new Random();
-            if (rnd.Next(32767) % 100 < MutationProbability)
+            Random rng = new Random();
+            if (rng.Next(32767) % 100 < MutationProbability)
             {
 
-                aici ca si in algoritmul propriuzis o sa se seteze toate astea 3 cu valori random dar intai trebuie sa vad cum iau datele din baza de date
-                int pos = rnd.Next(0, chromosome.Genes.Count);
-                chromosome.Genes[pos].Day 
-                chromosome.Genes[pos].Room 
-                chromosome.Genes[pos].Duration 
-
+                //aici ca si in algoritmul propriuzis o sa se seteze toate astea 3 cu valori random dar intai trebuie sa vad cum iau datele din baza de date
+                int pos = rng.Next(0, chromosome.Genes.Count);
+                chromosome.Genes[pos].Room = _rooms[rng.Next(_rooms.Count)];
+                chromosome.Genes[pos].Day = rng.Next(DAYS);
+                chromosome.Genes[pos].Hour = rng.Next(HOURS);
 
             }
             return chromosome;

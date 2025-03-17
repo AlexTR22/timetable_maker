@@ -27,6 +27,7 @@ namespace TimetableBackend.Service
                     Room room = new Room();
                     room.Id = (int)reader[0];
                     room.Name = reader.GetString(1);
+                    room.Capacity = (int)reader[2];
                     result.Add(room);
                 }
                 reader.Close();
@@ -55,6 +56,7 @@ namespace TimetableBackend.Service
                     Room room = new Room();
                     room.Id = (int)reader[0];
                     room.Name = reader.GetString(1);
+                    room.Capacity = (int)reader[2];
                     result.Add(room);
                 }
                 reader.Close();
@@ -76,11 +78,13 @@ namespace TimetableBackend.Service
 
                 SqlParameter id = new SqlParameter("@id", SqlDbType.Int);
                 SqlParameter name = new SqlParameter("@name", room.Name);
+                SqlParameter capacity = new SqlParameter("@capacity", room.Name);
 
                 id.Direction = ParameterDirection.Output;
 
                 cmd.Parameters.Add(id);
                 cmd.Parameters.Add(name);
+                cmd.Parameters.Add(capacity);
 
                 con.Open();
                 cmd.ExecuteNonQuery();
@@ -103,8 +107,10 @@ namespace TimetableBackend.Service
 
                 SqlParameter id = new SqlParameter("@id", room.Id);
                 SqlParameter name = new SqlParameter("@name", room.Name);
+                SqlParameter capacity = new SqlParameter("@capacity", room.Name);
                 cmd.Parameters.Add(id);
                 cmd.Parameters.Add(name);
+                cmd.Parameters.Add(capacity);
                 con.Open();
                 cmd.ExecuteNonQuery();
             }

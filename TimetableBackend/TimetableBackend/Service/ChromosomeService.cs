@@ -53,14 +53,14 @@ namespace TimetableBackend.Service
             }
         }
 
-        public int GetRoomsCountByUniversity()
+        public List<Room> GetRoomsByUniversity()
         {
             SqlConnection con = _helper.Connection;
             try
             {
-                int roomsCount=-1;
+                List<Room> rooms = new List<Room>();
 
-                SqlCommand cmd = new SqlCommand("GetRoomsCountByUniversity", con);
+                SqlCommand cmd = new SqlCommand("GetRoomsByUni", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 SqlParameter name = new SqlParameter("@UniversityName", _universityName);
@@ -70,11 +70,15 @@ namespace TimetableBackend.Service
                 SqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    roomsCount = (int)reader[0];
+                    Room room = new Room();
+                    room.Id = (int)reader[0];
+                    room.Name = reader.GetString(1);
+                    room.Capacity = (int)reader[2];
+                    rooms.Add(room);
                     //not ready yet, need more code
                 }
                 reader.Close();
-                return roomsCount;
+                return rooms;
             }
             finally
             {
