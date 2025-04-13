@@ -8,7 +8,10 @@ namespace TimetableBackend.Service
     {
         private readonly Helper _helper;
 
-
+        public GroupService(Helper helper)
+        {
+            _helper = helper ?? throw new ArgumentNullException(nameof(helper));
+        }
         public List<Group> GetAllGorups()
         {
             SqlConnection con = _helper.Connection;

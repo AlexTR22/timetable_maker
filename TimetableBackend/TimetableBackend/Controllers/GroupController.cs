@@ -10,9 +10,9 @@ namespace TimetableBackend.Controllers
     {
         public GroupService _groupService;
 
-        public GroupController()
+        public GroupController(GroupService groupService)
         {
-            _groupService = new GroupService();
+            _groupService = groupService;
         }
 
         [HttpGet]

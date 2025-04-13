@@ -1,6 +1,7 @@
 ﻿using System.Data.SqlClient;
 using System.Data;
 using TimetableBackend.Model;
+using System.Globalization;
 
 namespace TimetableBackend.Service
 {
@@ -9,11 +10,13 @@ namespace TimetableBackend.Service
         private readonly Helper _helper;
         private string _universityName;
 
-        public ChromosomeService(string universityName)
-        {
-            _universityName=universityName;
-        }
 
+        public ChromosomeService(Helper helper, string universityName)
+        {
+            _helper=helper ?? throw new ArgumentNullException(nameof(helper));
+            _universityName = universityName;
+        }
+       
 
         public Chromosome GetCourseClaseesByUniversity()
         {
@@ -22,11 +25,14 @@ namespace TimetableBackend.Service
             {
                 Chromosome chromosome= new Chromosome();
 
-                SqlCommand cmd = new SqlCommand("GetCourseClaseesByUniversity", con);
+                SqlCommand cmd = new SqlCommand("GetCourseClassesByUniversity", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 SqlParameter name = new SqlParameter("@UniversityName", _universityName);
+                //aici o sa trebuiasca sa iau dupa toti anii dar schimb mai tarziu, fac doar pentru un ad doar de test
+                SqlParameter year = new SqlParameter("@year", 1);
                 cmd.Parameters.Add(name);
+                cmd.Parameters.Add(year);
                 con.Open();
 
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -60,7 +66,7 @@ namespace TimetableBackend.Service
             {
                 List<Room> rooms = new List<Room>();
 
-                SqlCommand cmd = new SqlCommand("GetRoomsByUni", con);
+                SqlCommand cmd = new SqlCommand("GetRoomsByUniversity", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 SqlParameter name = new SqlParameter("@UniversityName", _universityName);

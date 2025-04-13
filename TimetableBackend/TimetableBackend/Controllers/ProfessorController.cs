@@ -8,11 +8,11 @@ namespace TimetableBackend.Controllers
     [Route("[controller]")]
     public class ProfessorController: ControllerBase
     {
-        public ProfessorServicecs _professorService;
+        public ProfessorService _professorService;
 
-        public ProfessorController()
+        public ProfessorController(ProfessorService professorService)
         {
-            _professorService = new ProfessorServicecs();
+            _professorService = professorService;
         }
 
         [HttpGet]

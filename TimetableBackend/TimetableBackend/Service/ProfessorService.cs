@@ -5,9 +5,13 @@ using TimetableBackend.Model;
 
 namespace TimetableBackend.Service
 {
-    public class ProfessorServicecs
+    public class ProfessorService
     {
         private readonly Helper _helper;
+        public ProfessorService(Helper helper)
+        {
+            _helper = helper ?? throw new ArgumentNullException(nameof(helper));
+        }
 
         public List<Professor> GetAllProfessors()
         {

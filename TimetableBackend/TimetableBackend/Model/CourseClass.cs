@@ -4,6 +4,14 @@ namespace TimetableBackend.Model
 {
     public class CourseClass
     {
+        public CourseClass() 
+        {
+            Professor = new Professor();
+            Group = new Group();
+            Course = new Course();
+            Room = new Room();
+        }
+
         private Professor _professor;
         public Professor Professor
         {
@@ -57,31 +65,19 @@ namespace TimetableBackend.Model
         // !!!!!!!!!! de retinut ca sunt sanse sa necesite o schimbare daca vreau o acuratete mai buna !!!!!!!!!!!!!
         public override bool Equals(object? obj)
         {
-            CourseClass? courseClass2 = obj as CourseClass;
-            if (courseClass2 != null)
+            if (obj is CourseClass courseClass2)
             {
-                if (this.Day != courseClass2.Day && this.Hour != courseClass2.Hour)
-                {
-                    if (this.Professor.Name == courseClass2.Professor.Name)
-                        return true;
-
-                    if (this.Room.Name == courseClass2.Room.Name)
-                        return true;
-
-                    if (this.Group.Name == courseClass2.Group.Name)
-                        return false;
-                }
-                else
-                {
-                    return false;
-                }
+                // Compara ziua, ora, camera, profesorul și grupul
+                return this.Day == courseClass2.Day &&
+                       this.Hour == courseClass2.Hour &&
+                       this.Room.Name == courseClass2.Room.Name &&
+                       this.Professor.Name == courseClass2.Professor.Name &&
+                       this.Group.Name == courseClass2.Group.Name;
             }
-            else
-            {
-                return false;
-            }
-            return true;
+
+            return false;
         }
+
 
         public override int GetHashCode()
         {

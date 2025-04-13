@@ -9,9 +9,9 @@ namespace TimetableBackend.Controllers
     public class CourseController : ControllerBase
     {
         public CourseService _courseService;
-        public CourseController()
+        public CourseController(CourseService courseService)
         {
-            _courseService = new CourseService();
+            _courseService = courseService;
         }
 
         [HttpGet]

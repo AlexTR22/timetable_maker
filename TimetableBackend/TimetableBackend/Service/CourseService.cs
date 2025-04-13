@@ -8,6 +8,10 @@ namespace TimetableBackend.Service
     {
         private readonly Helper _helper;
 
+        public CourseService(Helper helper)
+        {
+            helper = helper ?? throw new ArgumentNullException(nameof(helper));
+        }
 
         public List<Course> GetAllCourses()
         {
