@@ -12,6 +12,13 @@
             Fitness = 0;
         }
 
+        public Chromosome(Chromosome other)
+        {
+            // Deep copy the Genes using the CourseClass copy constructor
+            Genes = Genes = other.Genes.Select(course => new CourseClass(course)).ToList();
 
+            // Copy the Fitness value
+            Fitness = other.Fitness;
+        }
     }
 }

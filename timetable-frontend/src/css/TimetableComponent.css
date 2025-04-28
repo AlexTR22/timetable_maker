@@ -1,0 +1,65 @@
+.timetable-container {
+    padding: 1rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  
+  .timetable-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+    user-select: none;
+  }
+  
+  .timetable-grid {
+    display: grid;
+    grid-template-columns: 100px repeat(5, 1fr);
+    border: 1px solid #ccc;
+  }
+  
+  .header-cell {
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    font-weight: 600;
+    text-align: center;
+    color: black; /* Add this line */
+    user-select: none;
+  }
+  
+  .time-cell {
+
+    border: 1px solid #ccc;
+    text-align: center;
+    justify-content: center;
+    padding: 0.5rem;
+    font-weight: 500;
+    user-select: none;
+    color: red; 
+  }
+  .time-cell p{
+    width:auto;
+    height: auto;
+  }
+  .timetable-cell {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 160px;
+    height: 80px;
+  }
+  
+  .timetable-cell:hover {
+    background-color: #e0f0ff;
+  }
+
+  .classroom {
+    font-size: 0.9rem;
+    color: #555;
+    font-style: italic;
+  }
+  

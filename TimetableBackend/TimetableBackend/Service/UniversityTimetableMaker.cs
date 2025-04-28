@@ -83,15 +83,19 @@ namespace TimetableBackend.Service
 
                 _population.Sort((a, b) => b.Fitness.CompareTo(a.Fitness));
 
-                Chromosome parent1 = _population[0];
-                Chromosome parent2 = _population[1];
+                Chromosome parent1 = new Chromosome(_population[0]);
+                Chromosome parent2 = new Chromosome(_population[1]);
 
-                _population.Clear();
-
-                _population = CrossoverFunction(parent1, parent2);
+                //_population.Clear();
+                var chromosomes= CrossoverFunction(parent1, parent2);
+                for (int i=0;i<chromosomes.Count;i++)
+                {
+                    _population[i] = new Chromosome(chromosomes[i]);
+                }
+                
                 for (int i = 0; i < _population.Count; i++)
                 {
-                    MutationFunction(_population[i]);
+                    _population[0]=new Chromosome(MutationFunction(_population[i]));
                 }
 
 
@@ -135,6 +139,8 @@ namespace TimetableBackend.Service
 
 
         //for now i will make it so that each chromosome genes are split into 3
+
+        //wring adding in the gene class
         public List<Chromosome> CrossoverFunction(Chromosome parent1, Chromosome parent2)
         {
             Random rng = new Random();
@@ -158,6 +164,9 @@ namespace TimetableBackend.Service
 
                     child1.Genes.Add(new CourseClass
                     {
+                        Professor= parent1.Genes[i].Professor,
+                        Group= parent1.Genes[i].Group,
+                        Course=parent1.Genes[i].Course,
                         Day = parent2.Genes[i].Day,
                         Hour = parent2.Genes[i].Hour,
                         Room = parent2.Genes[i].Room
@@ -165,6 +174,9 @@ namespace TimetableBackend.Service
 
                     child2.Genes.Add(new CourseClass
                     {
+                        Professor = parent1.Genes[i].Professor,
+                        Group = parent1.Genes[i].Group,
+                        Course = parent1.Genes[i].Course,
                         Day = tempZi,
                         Hour = tempOra,
                         Room = tempRoom
@@ -173,8 +185,8 @@ namespace TimetableBackend.Service
                 else
                 {
                     // Altfel, lasă genele nemodificate (copiază direct din părinți)
-                    child1.Genes.Add(parent1.Genes[i]);
-                    child2.Genes.Add(parent2.Genes[i]);
+                    child1.Genes.Add(new CourseClass(parent1.Genes[i]));
+                    child2.Genes.Add(new CourseClass(parent2.Genes[i]));
                 }
             }
             newPopulation.Add(child1);

@@ -4,5 +4,13 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public Group()
+        {
+        }
+        public Group(Group other)
+        {
+            Id = other.Id;
+            Name = other.Name;
+        }
     }
 }

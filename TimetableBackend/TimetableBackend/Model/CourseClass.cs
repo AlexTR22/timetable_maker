@@ -11,6 +11,16 @@ namespace TimetableBackend.Model
             Course = new Course();
             Room = new Room();
         }
+        public CourseClass(CourseClass other)
+        {
+            Professor = new Professor(other.Professor); // Assuming Professor has a copy constructor
+            Duration = other.Duration;
+            Group = new Group(other.Group); // Assuming Group has a copy constructor
+            Course = new Course(other.Course); // Assuming Course has a copy constructor
+            Room = new Room(other.Room); // Assuming Room has a copy constructor
+            Day = other.Day;
+            Hour = other.Hour;
+        }
 
         private Professor _professor;
         public Professor Professor
