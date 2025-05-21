@@ -41,29 +41,29 @@ namespace TimetableBackend.Service
             public TimetableGrid Timetable { get; set; }
         }
 
-        public List<GroupTimetable> GetTimetableForFrontend(List<CourseClass> courseClasses)
+        public List<GroupTimetable> GetTimetableForFrontend(List<SubjectClass> SubjectClasses)
         {
            
             var groupTimetables = new List<GroupTimetable>();
 
             
-            var groupedCourses = courseClasses.GroupBy(cc => cc.Group.Name);
+            var groupedSubjects = SubjectClasses.GroupBy(cc => cc.Group.Name);
 
 
-            foreach (var group in groupedCourses)
+            foreach (var group in groupedSubjects)
             {
 
                 var timetable = new TimetableGrid();
 
-                foreach (var courseClass in group)
+                foreach (var SubjectClass in group)
                 {
-                    int hour = courseClass.Hour;
-                    int dayOfWeek = courseClass.Day;
+                    int hour = SubjectClass.Hour;
+                    int dayOfWeek = SubjectClass.Day;
 
-                    timetable.WeekdaySlots[dayOfWeek][hour].Subject = courseClass.Course.Name;
-                    timetable.WeekdaySlots[dayOfWeek][hour].Professor = courseClass.Professor.Name;
-                    timetable.WeekdaySlots[dayOfWeek][hour].Room = courseClass.Room.Name;          
-                    timetable.WeekdaySlots[dayOfWeek][hour].Group = courseClass.Group.Name;
+                    timetable.WeekdaySlots[dayOfWeek][hour].Subject = SubjectClass.Subject.Name;
+                    timetable.WeekdaySlots[dayOfWeek][hour].Professor = SubjectClass.Professor.Name;
+                    timetable.WeekdaySlots[dayOfWeek][hour].Room = SubjectClass.Room.Name;          
+                    timetable.WeekdaySlots[dayOfWeek][hour].Group = SubjectClass.Group.Name;
                 }
 
                 // Add this group's timetable to the result list

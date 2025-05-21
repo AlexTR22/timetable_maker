@@ -24,7 +24,7 @@ namespace TimetableBackend.Service
 
         ChromosomeService ChromosomeService { get; set; }
 
-        public UniversityTimetableMaker(int generations,int nrChromosomes, string universityName, Helper helper)
+        public UniversityTimetableMaker(int generations,int nrChromosomes, string collegeName, bool semester, Helper helper)
         {
             _helper = helper;
 
@@ -32,14 +32,14 @@ namespace TimetableBackend.Service
             Generations = generations;
             NrChromosomes = nrChromosomes;
             MutationProbability = 3;
-            ChromosomeService = new ChromosomeService(helper,universityName);
+            ChromosomeService = new ChromosomeService(helper, collegeName, semester);
 
             //_rooms = new List<Room>();
-            _rooms= ChromosomeService.GetRoomsByUniversity();
+            _rooms= ChromosomeService.GetRoomsByCollege();
 
             if (_population.Count == 0)
             {
-                Chromosome c = ChromosomeService.GetCourseClaseesByUniversity();
+                Chromosome c = ChromosomeService.GetSubjectClaseesByUniversity();
                 _population.Add(c);
             }
 
@@ -128,6 +128,7 @@ namespace TimetableBackend.Service
                     if (chromosome.Genes[i].Equals(chromosome.Genes[j]))
                     {
                         result--;
+                        //verify constraints
                         break;
                         
                     }
@@ -162,21 +163,21 @@ namespace TimetableBackend.Service
                     var tempOra = parent1.Genes[i].Hour;
                     var tempRoom = parent1.Genes[i].Room;
 
-                    child1.Genes.Add(new CourseClass
+                    child1.Genes.Add(new SubjectClass
                     {
                         Professor= parent1.Genes[i].Professor,
                         Group= parent1.Genes[i].Group,
-                        Course=parent1.Genes[i].Course,
+                        Subject=parent1.Genes[i].Subject,
                         Day = parent2.Genes[i].Day,
                         Hour = parent2.Genes[i].Hour,
                         Room = parent2.Genes[i].Room
                     });
 
-                    child2.Genes.Add(new CourseClass
+                    child2.Genes.Add(new SubjectClass
                     {
                         Professor = parent1.Genes[i].Professor,
                         Group = parent1.Genes[i].Group,
-                        Course = parent1.Genes[i].Course,
+                        Subject = parent1.Genes[i].Subject,
                         Day = tempZi,
                         Hour = tempOra,
                         Room = tempRoom
@@ -185,8 +186,8 @@ namespace TimetableBackend.Service
                 else
                 {
                     // Altfel, lasă genele nemodificate (copiază direct din părinți)
-                    child1.Genes.Add(new CourseClass(parent1.Genes[i]));
-                    child2.Genes.Add(new CourseClass(parent2.Genes[i]));
+                    child1.Genes.Add(new SubjectClass(parent1.Genes[i]));
+                    child2.Genes.Add(new SubjectClass(parent2.Genes[i]));
                 }
             }
             newPopulation.Add(child1);
@@ -199,7 +200,7 @@ namespace TimetableBackend.Service
             //    for (int j = 0; j < 3; j++)
             //    {
             //        int aux = rng.Next(0, 2); // Alegem între parent1 și parent2
-            //        List<CourseClass> selectedGenes;
+            //        List<SubjectClass> selectedGenes;
 
             //        if (j == 0)
             //        {

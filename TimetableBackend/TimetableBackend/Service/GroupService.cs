@@ -18,7 +18,7 @@ namespace TimetableBackend.Service
             try
             {
                 List<Group> result = new List<Group>();
-                SqlCommand cmd = new SqlCommand("GetAllCourses", con);
+                SqlCommand cmd = new SqlCommand("GetAllGroups", con);
 
                 cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
@@ -40,16 +40,16 @@ namespace TimetableBackend.Service
             }
         }
 
-        public List<Group> GetAllGorupsByUniversity(string uniName)
+        public List<Group> GetAllGorupsByCollege(string collegeName)
         {
             SqlConnection con = _helper.Connection;
             try
             {
                 List<Group> result = new List<Group>();
-                SqlCommand cmd = new SqlCommand("GetAllRoomsByUni", con);
+                SqlCommand cmd = new SqlCommand("GetAllGoupsByCollege", con);
 
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlParameter name = new SqlParameter("@name", uniName);
+                SqlParameter name = new SqlParameter("@name", collegeName);
 
                 cmd.Parameters.Add(name);
                 con.Open();
@@ -75,7 +75,7 @@ namespace TimetableBackend.Service
             SqlConnection con = _helper.Connection;
             try
             {
-                SqlCommand cmd = new SqlCommand("AddRoom", con);
+                SqlCommand cmd = new SqlCommand("AddGroup", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 SqlParameter id = new SqlParameter("@id", SqlDbType.Int);
@@ -99,7 +99,7 @@ namespace TimetableBackend.Service
             SqlConnection con = _helper.Connection;
             try
             {
-                SqlCommand cmd = new SqlCommand("ModifyRoom", con);
+                SqlCommand cmd = new SqlCommand("ModifyGroup", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 SqlParameter id = new SqlParameter("@id", group.Id);
@@ -121,7 +121,7 @@ namespace TimetableBackend.Service
             SqlConnection con = _helper.Connection;
             try
             {
-                SqlCommand cmd = new SqlCommand("DeleteRoom", con);
+                SqlCommand cmd = new SqlCommand("DeleteGroup", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 SqlParameter id = new SqlParameter("@id", groupId);

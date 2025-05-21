@@ -39,15 +39,15 @@ namespace TimetableBackend.Service
             }
         }
 
-        public List<Room> GetAllRoomsByUniversity(string uniName)
+        public List<Room> GetAllRoomsByCollege(string collegeName)
         {
             SqlConnection con = _helper.Connection;
             try
             {
-                SqlCommand cmd = new SqlCommand("GetAllRoomsByUni", con);
+                SqlCommand cmd = new SqlCommand("GetAllRoomsByCollege", con);
                 List<Room> result = new List<Room>();
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlParameter name = new SqlParameter("@name", uniName);
+                SqlParameter name = new SqlParameter("@name", collegeName);
                 cmd.Parameters.Add(name);
                 con.Open();
                 SqlDataReader reader = cmd.ExecuteReader();

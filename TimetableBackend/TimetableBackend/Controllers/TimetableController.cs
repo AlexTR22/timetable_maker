@@ -23,7 +23,7 @@ namespace TimetableBackend.Controllers
         [ProducesResponseType(200)]
         public async Task<IActionResult> GetTimetable()
         {
-            _timetableMaker = new UniversityTimetableMaker(100, 2, "UNITBV",_helper);
+            _timetableMaker = new UniversityTimetableMaker(100, 2, "FMI",false,_helper);
             Chromosome chromosome = _timetableMaker.Run();
             List<GroupTimetable> groupsTimetable = new List<GroupTimetable>();
             groupsTimetable = _chromosomeToTimetable.GetTimetableForFrontend(chromosome.Genes);

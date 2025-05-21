@@ -41,17 +41,17 @@ namespace TimetableBackend.Service
             }
         }
 
-        public List<Professor> GetAllProfessorsByUniversity(string uniName)
+        public List<Professor> GetAllProfessorsByCollege(string collegeName)
         {
             SqlConnection con = _helper.Connection;
             try
             {
                 List<Professor> result = new List<Professor>();
 
-                SqlCommand cmd = new SqlCommand("GetAllProfessorsByUni", con);
+                SqlCommand cmd = new SqlCommand("GetAllProfessorsByCollege", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                SqlParameter name = new SqlParameter("@name", uniName);
+                SqlParameter name = new SqlParameter("@name", collegeName);
                  
                 cmd.Parameters.Add(name);
                 con.Open();

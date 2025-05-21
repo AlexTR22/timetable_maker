@@ -8,45 +8,49 @@ namespace TimetableBackend.Service
     public class ChromosomeService
     {
         private readonly Helper _helper;
-        private string _universityName;
+        private string _collegeName;
+        private bool _semester;
 
 
-        public ChromosomeService(Helper helper, string universityName)
+        public ChromosomeService(Helper helper, string collegeName, bool semester)
         {
             _helper=helper ?? throw new ArgumentNullException(nameof(helper));
-            _universityName = universityName;
+            _collegeName = collegeName;
+            _semester = semester;
         }
        
 
-        public Chromosome GetCourseClaseesByUniversity()
+        public Chromosome GetSubjectClaseesByUniversity()
         {
             SqlConnection con = _helper.Connection;
             try
             {
                 Chromosome chromosome= new Chromosome();
 
-                SqlCommand cmd = new SqlCommand("GetCourseClassesByUniversity", con);
+                SqlCommand cmd = new SqlCommand("GetSubjectClassesByUniversity", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                SqlParameter name = new SqlParameter("@UniversityName", _universityName);
+                SqlParameter name = new SqlParameter("@collegeName", _collegeName);
                 //aici o sa trebuiasca sa iau dupa toti anii dar schimb mai tarziu, fac doar pentru un ad doar de test
                 SqlParameter year = new SqlParameter("@year", 1);
+                SqlParameter semester = new SqlParameter("@semester", _semester);
                 cmd.Parameters.Add(name);
                 cmd.Parameters.Add(year);
+                cmd.Parameters.Add(semester);
                 con.Open();
 
                 SqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    CourseClass courseClass = new CourseClass();
-                    courseClass.Course.Id = (int)reader[0];
-                    courseClass.Course.Name = reader.GetString(1);
-                    courseClass.Course.Year= (int)reader[2];
-                    courseClass.Professor.Id = (int)reader[3];
-                    courseClass.Professor.Name = reader.GetString(4);
-                    courseClass.Group.Id = (int)reader[5];
-                    courseClass.Group.Name = reader.GetString(6);
-                    chromosome.Genes.Add(courseClass);
+                    SubjectClass SubjectClass = new SubjectClass();
+                    SubjectClass.Subject.Id = (int)reader[0];
+                    SubjectClass.Subject.Name = reader.GetString(1);
+                    SubjectClass.Subject.Year= (int)reader[2];
+                    SubjectClass.Professor.Id = (int)reader[3];
+                    SubjectClass.Professor.Name = reader.GetString(4);
+                    SubjectClass.Group.Id = (int)reader[5];
+                    SubjectClass.Group.Name = reader.GetString(6);
+                    chromosome.Genes.Add(SubjectClass);
                     //not ready yet, need more code
                     //its ready, not sure if it's correct
                 }
@@ -59,7 +63,7 @@ namespace TimetableBackend.Service
             }
         }
 
-        public List<Room> GetRoomsByUniversity()
+        public List<Room> GetRoomsByCollege()
         {
             SqlConnection con = _helper.Connection;
             try
@@ -69,7 +73,7 @@ namespace TimetableBackend.Service
                 SqlCommand cmd = new SqlCommand("GetRoomsByUniversity", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                SqlParameter name = new SqlParameter("@UniversityName", _universityName);
+                SqlParameter name = new SqlParameter("@UniversityName", _collegeName);
                 cmd.Parameters.Add(name);
                 con.Open();
 

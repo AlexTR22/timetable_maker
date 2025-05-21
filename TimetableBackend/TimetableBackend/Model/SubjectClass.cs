@@ -2,21 +2,21 @@
 
 namespace TimetableBackend.Model
 {
-    public class CourseClass
+    public class SubjectClass
     {
-        public CourseClass() 
+        public SubjectClass() 
         {
             Professor = new Professor();
             Group = new Group();
-            Course = new Course();
+            Subject = new Subject();
             Room = new Room();
         }
-        public CourseClass(CourseClass other)
+        public SubjectClass(SubjectClass other)
         {
             Professor = new Professor(other.Professor); // Assuming Professor has a copy constructor
             Duration = other.Duration;
             Group = new Group(other.Group); // Assuming Group has a copy constructor
-            Course = new Course(other.Course); // Assuming Course has a copy constructor
+            Subject = new Subject(other.Subject); // Assuming Subject has a copy constructor
             Room = new Room(other.Room); // Assuming Room has a copy constructor
             Day = other.Day;
             Hour = other.Hour;
@@ -42,11 +42,11 @@ namespace TimetableBackend.Model
             set { _group = value; }
         }
 
-        private Course _course;
-        public Course Course
+        private Subject _Subject;
+        public Subject Subject
         {
-            get { return _course; }
-            set { _course = value; }
+            get { return _Subject; }
+            set { _Subject = value; }
         }
 
         private Room _room;
@@ -75,14 +75,14 @@ namespace TimetableBackend.Model
         // !!!!!!!!!! de retinut ca sunt sanse sa necesite o schimbare daca vreau o acuratete mai buna !!!!!!!!!!!!!
         public override bool Equals(object? obj)
         {
-            if (obj is CourseClass courseClass2)
+            if (obj is SubjectClass SubjectClass2)
             {
                 // Compara ziua, ora, camera, profesorul și grupul
-                return this.Day == courseClass2.Day &&
-                       this.Hour == courseClass2.Hour &&
-                       this.Room.Name == courseClass2.Room.Name &&
-                       this.Professor.Name == courseClass2.Professor.Name &&
-                       this.Group.Name == courseClass2.Group.Name;
+                return this.Day == SubjectClass2.Day &&
+                       this.Hour == SubjectClass2.Hour &&
+                       this.Room.Name == SubjectClass2.Room.Name &&
+                       this.Professor.Name == SubjectClass2.Professor.Name &&
+                       this.Group.Name == SubjectClass2.Group.Name;
             }
 
             return false;
@@ -97,7 +97,7 @@ namespace TimetableBackend.Model
                 hash=hash* 23 + Day.GetHashCode();
                 hash=hash* 23 + Hour.GetHashCode();
                 hash=hash* 23 + (Professor!=null ? Professor.Name.GetHashCode():0);
-                hash=hash* 23 + (Course!=null ? Course.Name.GetHashCode():0);
+                hash=hash* 23 + (Subject!=null ? Subject.Name.GetHashCode():0);
                 hash=hash* 23 + (Room!=null ? Room.Name.GetHashCode():0);
                 hash=hash* 23 + (Group!=null ? Group.Name.GetHashCode():0);
                 return hash;
