@@ -1,5 +1,5 @@
-﻿using System.Data.SqlClient;
-using System.Data;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;          // ↩️  Folosește noul provider recomandat
 using TimetableBackend.Model;
 
 namespace TimetableBackend.Service
@@ -12,127 +12,147 @@ namespace TimetableBackend.Service
         {
             _helper = helper ?? throw new ArgumentNullException(nameof(helper));
         }
-        public List<Group> GetAllGorups()
+
+        /* ------------------------------------------------------------------ */
+        /*  READ ALL GROUPS                                                   */
+        /* ------------------------------------------------------------------ */
+        public List<Group> GetAllGroups()
         {
-            SqlConnection con = _helper.Connection;
-            try
+            var result = new List<Group>();
+
+            // using-urile asigură eliberarea resurselor fără a mai apela Close()
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("GetAllGroups", con)
             {
-                List<Group> result = new List<Group>();
-                SqlCommand cmd = new SqlCommand("GetAllGroups", con);
+                CommandType = CommandType.StoredProcedure
+            };
 
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
+            con.Open();
+            using var reader = cmd.ExecuteReader();
 
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+            while (reader.Read())
+            {
+                result.Add(new Group
                 {
-                    Group group = new Group();
-                    group.Id = (int)reader[0];
-                    group.Name = reader.GetString(1);
-                    result.Add(group);
-                }
-                reader.Close();
-                return result;
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Year= reader.GetInt32(2),
+                    CollegeId = reader.GetInt32(3),
+                });
             }
-            finally
-            {
-                con.Close();
-            }
+
+            return result;
         }
 
-        public List<Group> GetAllGorupsByCollege(string collegeName)
+        /* ------------------------------------------------------------------ */
+        /*  READ GROUPS BY COLLEGE                                            */
+        /* ------------------------------------------------------------------ */
+        public List<Group> GetAllGroupsByCollege(string collegeName)
         {
-            SqlConnection con = _helper.Connection;
-            try
+            var result = new List<Group>();
+
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("GetAllGroupsByCollege", con)
             {
-                List<Group> result = new List<Group>();
-                SqlCommand cmd = new SqlCommand("GetAllGoupsByCollege", con);
+                CommandType = CommandType.StoredProcedure
+            };
 
-                cmd.CommandType = CommandType.StoredProcedure;
-                SqlParameter name = new SqlParameter("@name", collegeName);
+            // Evităm AddWithValue—specificăm explicit tipul și dimensiunea
+            cmd.Parameters
+               .Add("@Name", SqlDbType.NVarChar, 100)
+               .Value = collegeName;
 
-                cmd.Parameters.Add(name);
-                con.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+            con.Open();
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                result.Add(new Group
                 {
-                    Group group = new Group();
-                    group.Id = (int)reader[0];
-                    group.Name = reader.GetString(1);
-                    result.Add(group);
-                }
-                reader.Close();
-                return result;
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Year = reader.GetInt32(2),
+                    CollegeId = reader.GetInt32(3),
+                });
             }
-            finally
-            {
-                con.Close();
-            }
+
+            return result;
         }
 
-        public void AddGorupInDatabase(Group group)
+        /* ------------------------------------------------------------------ */
+        /*  CREATE                                                            */
+        /* ------------------------------------------------------------------ */
+        public bool AddGroupInDatabase(Group group)
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("AddGroup", con)
             {
-                SqlCommand cmd = new SqlCommand("AddGroup", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+                CommandType = CommandType.StoredProcedure
+            };
 
-                SqlParameter id = new SqlParameter("@id", SqlDbType.Int);
-                SqlParameter name = new SqlParameter("@name", group.Name);
-                id.Direction = ParameterDirection.Output;
-
-                cmd.Parameters.Add(id);
-                cmd.Parameters.Add(name);
-                con.Open();
-                cmd.ExecuteNonQuery();
-                group.Id = (int)id.Value;
-            }
-            finally
+            var idParam = new SqlParameter("@Id", SqlDbType.Int)
             {
-                con.Close();
-            }
+                Direction = ParameterDirection.Output
+            };
+            cmd.Parameters.Add(idParam);
+
+            cmd.Parameters
+               .Add("@Name", SqlDbType.NVarChar, 100)
+               .Value = group.Name;
+            cmd.Parameters
+               .Add("@Year", SqlDbType.Int)
+               .Value = group.Year;
+            cmd.Parameters
+               .Add("@CollegeId", SqlDbType.Int)
+               .Value = group.CollegeId;
+
+            con.Open();
+            int rowsAffected = cmd.ExecuteNonQuery();
+
+            group.Id = (int)idParam.Value;
+            return rowsAffected > 0;
         }
 
-        public void ModifyGroupInDatabase(Group group)
+        /* ------------------------------------------------------------------ */
+        /*  UPDATE                                                            */
+        /* ------------------------------------------------------------------ */
+        public bool ModifyGroupInDatabase(Group group)
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("ModifyGroup", con)
             {
-                SqlCommand cmd = new SqlCommand("ModifyGroup", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+                CommandType = CommandType.StoredProcedure
+            };
 
-                SqlParameter id = new SqlParameter("@id", group.Id);
-                SqlParameter name = new SqlParameter("@name", group.Name);
-
-                cmd.Parameters.Add(id);
-                cmd.Parameters.Add(name);
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-            finally
-            {
-                con.Close();
-            }
+            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = group.Id;
+            cmd.Parameters.Add("@Name", SqlDbType.NVarChar, 100).Value = group.Name;
+            cmd.Parameters
+               .Add("@Year", SqlDbType.Int)
+               .Value = group.Year;
+            cmd.Parameters
+               .Add("@CollegeId", SqlDbType.Int)
+               .Value = group.CollegeId;
+            con.Open();
+            int rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected > 0;
         }
 
-        public void DeleteGroupInDatabase(int groupId)
+        /* ------------------------------------------------------------------ */
+        /*  DELETE                                                            */
+        /* ------------------------------------------------------------------ */
+        public bool DeleteGroupInDatabase(int groupId)
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("DeleteGroup", con)
             {
-                SqlCommand cmd = new SqlCommand("DeleteGroup", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+                CommandType = CommandType.StoredProcedure
+            };
 
-                SqlParameter id = new SqlParameter("@id", groupId);
-                cmd.Parameters.Add(id);
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-            finally
-            {
-                con.Close();
-            }
+            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = groupId;
+
+            con.Open();
+            int rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected > 0;
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using System.Data.SqlClient;
-using System.Data;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
 using TimetableBackend.Model;
 
 namespace TimetableBackend.Service
@@ -10,130 +10,128 @@ namespace TimetableBackend.Service
 
         public SubjectService(Helper helper)
         {
-            helper = helper ?? throw new ArgumentNullException(nameof(helper));
+            _helper = helper ?? throw new ArgumentNullException(nameof(helper));
         }
 
         public List<Subject> GetAllSubjects()
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("GetAllSubjects", con)
             {
-                List<Subject> result = new List<Subject>();
-                SqlCommand cmd = new SqlCommand("GetAllSubjects", con);
+                CommandType = CommandType.StoredProcedure
+            };
 
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
+            con.Open();
+            using var reader = cmd.ExecuteReader();
+            var result = new List<Subject>();
 
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+            while (reader.Read())
+            {
+                var subject = new Subject
                 {
-                    Subject Subject = new Subject();
-                    Subject.Id = (int)reader[0];
-                    Subject.Name = reader.GetString(1);
-                    result.Add(Subject);
-                }
-                reader.Close();
-                return result;
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Year = reader.GetInt32(2),
+                    Semester = reader.GetBoolean(3),
+                    IdProfessor = reader.GetInt32(4),
+                    IdCollege = reader.GetInt32(5),
+                };
+                result.Add(subject);
             }
-            finally
-            {
-                con.Close();
-            }
+
+            return result;
         }
 
         public List<Subject> GetAllSubjectsByCollege(string collegeName)
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("GetAllSubjectsByCollege", con)
             {
-                List<Subject> result = new List<Subject>();
-                SqlCommand cmd = new SqlCommand("GetAllSubjectsByCollege", con);
+                CommandType = CommandType.StoredProcedure
+            };
 
-                cmd.CommandType = CommandType.StoredProcedure;
-                SqlParameter name = new SqlParameter("@name", collegeName);
+            cmd.Parameters.AddWithValue("@Name", collegeName);
 
-                cmd.Parameters.Add(name);
-                con.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+            con.Open();
+            using var reader = cmd.ExecuteReader();
+            var result = new List<Subject>();
+
+            while (reader.Read())
+            {
+                var subject = new Subject
                 {
-                    Subject Subject = new Subject();
-                    Subject.Id = (int)reader[0];
-                    Subject.Name = reader.GetString(1);
-                    result.Add(Subject);
-                }
-                reader.Close();
-                return result;
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Year = reader.GetInt32(2),
+                    Semester = reader.GetBoolean(3),
+                    IdProfessor = reader.GetInt32(4),
+                    IdCollege = reader.GetInt32(5),
+                };
+                result.Add(subject);
             }
-            finally
-            {
-                con.Close();
-            }
+
+            return result;
         }
 
-        public void AddSubjectInDatabase(Subject Subject)
+        public bool AddSubjectInDatabase(Subject subject)
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("AddSubject", con)
             {
-                SqlCommand cmd = new SqlCommand("AddSubject", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+                CommandType = CommandType.StoredProcedure
+            };
 
-                SqlParameter id = new SqlParameter("@id", SqlDbType.Int);
-                SqlParameter name = new SqlParameter("@name", Subject.Name);
-                id.Direction = ParameterDirection.Output;
-
-                cmd.Parameters.Add(id);
-                cmd.Parameters.Add(name);
-                con.Open();
-                cmd.ExecuteNonQuery();
-                Subject.Id = (int)id.Value;
-            }
-            finally
+            var idParam = new SqlParameter("Id", SqlDbType.Int)
             {
-                con.Close();
-            }
+                Direction = ParameterDirection.Output
+            };
+
+            cmd.Parameters.Add(idParam);
+            cmd.Parameters.AddWithValue("@Name", subject.Name);
+            cmd.Parameters.AddWithValue("@Year", subject.Year);
+            cmd.Parameters.AddWithValue("@CollegeId", subject.IdCollege);
+            cmd.Parameters.AddWithValue("@ProfessorId", subject.IdProfessor);
+            cmd.Parameters.AddWithValue("@Semester", subject.Semester);
+
+            con.Open();
+            int rowsAffected = cmd.ExecuteNonQuery();
+            subject.Id = (int)idParam.Value;
+            return rowsAffected > 0;
         }
 
-        public void ModifySubjectInDatabase(Subject Subject)
+        public bool ModifySubjectInDatabase(Subject subject)
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("ModifySubject", con)
             {
-                SqlCommand cmd = new SqlCommand("ModifySubject", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+                CommandType = CommandType.StoredProcedure
+            };
 
-                SqlParameter id = new SqlParameter("@id", Subject.Id);
-                SqlParameter name = new SqlParameter("@name", Subject.Name);
+            cmd.Parameters.AddWithValue("@Id", subject.Id);
+            cmd.Parameters.AddWithValue("@Name", subject.Name);
+            cmd.Parameters.AddWithValue("@Year", subject.Year);
+            cmd.Parameters.AddWithValue("@CollegeId", subject.IdCollege);
+            cmd.Parameters.AddWithValue("@ProfessorId", subject.IdProfessor);
+            cmd.Parameters.AddWithValue("@Semester", subject.Semester);
 
-                cmd.Parameters.Add(id);
-                cmd.Parameters.Add(name);
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-            finally
-            {
-                con.Close();
-            }
+            con.Open();
+            int rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected > 0;
         }
 
-        public void DeleteSubjectInDatabase(int SubjectId)
+        public bool DeleteSubjectInDatabase(int subjectId)
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("DeleteSubject", con)
             {
-                SqlCommand cmd = new SqlCommand("DeleteSubject", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+                CommandType = CommandType.StoredProcedure
+            };
 
-                SqlParameter id = new SqlParameter("@id", SubjectId);
-                cmd.Parameters.Add(id);
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-            finally
-            {
-                con.Close();
-            }
+            cmd.Parameters.AddWithValue("@Id", subjectId);
+
+            con.Open();
+            int rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected > 0;
         }
     }
 }

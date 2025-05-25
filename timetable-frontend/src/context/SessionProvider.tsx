@@ -12,6 +12,7 @@ import React, {
 export interface User {
   id: string;         
   username: string;
+  universityId: number;
   role?: string;
 }
 

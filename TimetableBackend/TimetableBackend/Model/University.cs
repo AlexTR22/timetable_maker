@@ -1,20 +1,17 @@
 ﻿namespace TimetableBackend.Model
 {
-    public class Professor
+    public class University
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int CollegeId { get; set; }
-
-        public Professor()
-        {
-        }
-
-        public Professor(Professor other)
+        public string CityName { get; set; }
+        public University() { }
+        public University(University other) 
         {
             Id = other.Id;
             Name = other.Name;
-            CollegeId = other.CollegeId;
+            CityName = other.CityName;
         }
+
     }
 }

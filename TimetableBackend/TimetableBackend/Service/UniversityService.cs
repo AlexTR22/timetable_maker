@@ -1,27 +1,28 @@
-﻿using System.Data;
-using Microsoft.Data.SqlClient;         
+﻿using Microsoft.Data.SqlClient;
+using System.Data;
 using TimetableBackend.Model;
 
 namespace TimetableBackend.Service
 {
-    public class RoomService
+    public class UniversityService
     {
         private readonly Helper _helper;
 
-        public RoomService(Helper helper)
+        public UniversityService(Helper helper)
         {
             _helper = helper ?? throw new ArgumentNullException(nameof(helper));
         }
 
         /* ------------------------------------------------------------------ */
-        /*  READ ALL ROOMS                                                    */
+        /*  READ ALL UniversityS                                                   */
         /* ------------------------------------------------------------------ */
-        public List<Room> GetAllRooms()
+        public List<University> GetAllUniversities()
         {
-            var result = new List<Room>();
+            var result = new List<University>();
 
+            // using-urile asigură eliberarea resurselor fără a mai apela Close()
             using var con = _helper.Connection;
-            using var cmd = new SqlCommand("GetAllRooms", con)
+            using var cmd = new SqlCommand("GetAllUniversitys", con)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -31,13 +32,11 @@ namespace TimetableBackend.Service
 
             while (reader.Read())
             {
-                result.Add(new Room
+                result.Add(new University
                 {
                     Id = reader.GetInt32(0),
                     Name = reader.GetString(1),
-                    Capacity = reader.GetInt32(2),
-                    CollegeId = reader.GetInt32(3),
-
+                    CityName = reader.GetString(2),
                 });
             }
 
@@ -45,18 +44,19 @@ namespace TimetableBackend.Service
         }
 
         /* ------------------------------------------------------------------ */
-        /*  READ ROOMS BY COLLEGE                                             */
+        /*  READ UniversityS BY COLLEGE                                            */
         /* ------------------------------------------------------------------ */
-        public List<Room> GetAllRoomsByCollege(string collegeName)
+        public List<University> GetAllUniversitiesByCollege(string collegeName)
         {
-            var result = new List<Room>();
+            var result = new List<University>();
 
             using var con = _helper.Connection;
-            using var cmd = new SqlCommand("GetAllRoomsByCollege", con)
+            using var cmd = new SqlCommand("GetAllUniversitysByCollege", con)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
+            // Evităm AddWithValue—specificăm explicit tipul și dimensiunea
             cmd.Parameters
                .Add("@Name", SqlDbType.NVarChar, 100)
                .Value = collegeName;
@@ -66,12 +66,11 @@ namespace TimetableBackend.Service
 
             while (reader.Read())
             {
-                result.Add(new Room
+                result.Add(new University
                 {
                     Id = reader.GetInt32(0),
                     Name = reader.GetString(1),
-                    Capacity = reader.GetInt32(2),
-                    CollegeId= reader.GetInt32(3),
+                    CityName = reader.GetString(2),
                 });
             }
 
@@ -81,10 +80,10 @@ namespace TimetableBackend.Service
         /* ------------------------------------------------------------------ */
         /*  CREATE                                                            */
         /* ------------------------------------------------------------------ */
-        public bool AddRoomInDatabase(Room room)
+        public bool AddUniversityInDatabase(University University)
         {
             using var con = _helper.Connection;
-            using var cmd = new SqlCommand("AddRoom", con)
+            using var cmd = new SqlCommand("AddUniversity", con)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -97,36 +96,35 @@ namespace TimetableBackend.Service
 
             cmd.Parameters
                .Add("@Name", SqlDbType.NVarChar, 100)
-               .Value = room.Name;
+               .Value = University.Name;
+            cmd.Parameters
+               .Add("@CityName", SqlDbType.Int)
+               .Value = University.CityName;
 
-            cmd.Parameters
-               .Add("@Capacity", SqlDbType.Int)
-               .Value = room.Capacity;
-            cmd.Parameters
-               .Add("@CollegeId", SqlDbType.Int)
-               .Value = room.CollegeId;
             con.Open();
             int rowsAffected = cmd.ExecuteNonQuery();
-            room.Id = (int)idParam.Value;
+
+            University.Id = (int)idParam.Value;
             return rowsAffected > 0;
         }
 
         /* ------------------------------------------------------------------ */
         /*  UPDATE                                                            */
         /* ------------------------------------------------------------------ */
-        public bool ModifyRoomInDatabase(Room room)
+        public bool ModifyUniversityInDatabase(University University)
         {
             using var con = _helper.Connection;
-            using var cmd = new SqlCommand("ModifyRoom", con)
+            using var cmd = new SqlCommand("ModifyUniversity", con)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = room.Id;
-            cmd.Parameters.Add("@Name", SqlDbType.NVarChar, 100).Value = room.Name;
-            cmd.Parameters.Add("@Capacity", SqlDbType.Int).Value = room.Capacity;
-            cmd.Parameters.Add("@CollegeId", SqlDbType.Int).Value = room.CollegeId;
-
+            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = University.Id;
+            cmd.Parameters.Add("@Name", SqlDbType.NVarChar, 100).Value = University.Name;
+            cmd.Parameters
+               .Add("@Year", SqlDbType.Int)
+               .Value = University.CityName;
+           
             con.Open();
             int rowsAffected = cmd.ExecuteNonQuery();
             return rowsAffected > 0;
@@ -135,15 +133,15 @@ namespace TimetableBackend.Service
         /* ------------------------------------------------------------------ */
         /*  DELETE                                                            */
         /* ------------------------------------------------------------------ */
-        public bool DeleteRoomInDatabase(int roomId)
+        public bool DeleteUniversityInDatabase(int UniversityId)
         {
             using var con = _helper.Connection;
-            using var cmd = new SqlCommand("DeleteRoom", con)
+            using var cmd = new SqlCommand("DeleteUniversity", con)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = roomId;
+            cmd.Parameters.Add("@Id", SqlDbType.Int).Value = UniversityId;
 
             con.Open();
             int rowsAffected = cmd.ExecuteNonQuery();

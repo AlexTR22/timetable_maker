@@ -7,9 +7,9 @@ function Home()
     return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4">
         <h1 className="text-3xl font-bold">Admin Portal</h1>
-        <button onClick={ ()=>navigate(`/login`)}>Adaugă Profesor</button>
-        <button>Adaugă Grupă</button>
-        <button>Adaugă Materie</button>
+        <button onClick={ ()=>navigate(`/professorPage`)}>Adaugă Profesor</button>
+        <button onClick={ ()=>navigate(`/groupPage`)}>Adaugă Grupă</button>
+        <button onClick={ ()=>navigate(`/subjectPage`)}>Adaugă Materie</button>
     </div>
     );
 };

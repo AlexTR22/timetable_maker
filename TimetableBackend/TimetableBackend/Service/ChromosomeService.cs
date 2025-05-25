@@ -1,101 +1,97 @@
-﻿using System.Data.SqlClient;
-using System.Data;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
 using TimetableBackend.Model;
-using System.Globalization;
 
 namespace TimetableBackend.Service
 {
     public class ChromosomeService
     {
         private readonly Helper _helper;
-        private string _collegeName;
-        private bool _semester;
+        private readonly string _collegeName;
+        private readonly bool _semester;
+        private readonly int _year;
 
-
-        public ChromosomeService(Helper helper, string collegeName, bool semester)
+        public ChromosomeService(Helper helper, string collegeName, bool semester,int year)
         {
-            _helper=helper ?? throw new ArgumentNullException(nameof(helper));
+            _helper = helper ?? throw new ArgumentNullException(nameof(helper));
             _collegeName = collegeName;
             _semester = semester;
+            _year = year;
         }
-       
 
-        public Chromosome GetSubjectClaseesByUniversity()
+        public Chromosome GetSubjectClassesByUniversity()
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("GetSubjectClassesByUniversity", con)
             {
-                Chromosome chromosome= new Chromosome();
+                CommandType = CommandType.StoredProcedure
+            };
 
-                SqlCommand cmd = new SqlCommand("GetSubjectClassesByUniversity", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@CollegeName", _collegeName);
+            cmd.Parameters.AddWithValue("@Year", _year);  // momentan fix, modifici după ce dorești
+            cmd.Parameters.AddWithValue("@Semester", _semester);
 
-                SqlParameter name = new SqlParameter("@collegeName", _collegeName);
-                //aici o sa trebuiasca sa iau dupa toti anii dar schimb mai tarziu, fac doar pentru un ad doar de test
-                SqlParameter year = new SqlParameter("@year", 1);
-                SqlParameter semester = new SqlParameter("@semester", _semester);
-                cmd.Parameters.Add(name);
-                cmd.Parameters.Add(year);
-                cmd.Parameters.Add(semester);
-                con.Open();
+            con.Open();
 
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+            using var reader = cmd.ExecuteReader();
+            var chromosome = new Chromosome();
+
+            while (reader.Read())
+            {
+                var subjectClass = new SubjectClass
                 {
-                    SubjectClass SubjectClass = new SubjectClass();
-                    SubjectClass.Subject.Id = (int)reader[0];
-                    SubjectClass.Subject.Name = reader.GetString(1);
-                    SubjectClass.Subject.Year= (int)reader[2];
-                    SubjectClass.Professor.Id = (int)reader[3];
-                    SubjectClass.Professor.Name = reader.GetString(4);
-                    SubjectClass.Group.Id = (int)reader[5];
-                    SubjectClass.Group.Name = reader.GetString(6);
-                    chromosome.Genes.Add(SubjectClass);
-                    //not ready yet, need more code
-                    //its ready, not sure if it's correct
-                }
-                reader.Close();
-                return chromosome;
+                    Subject = new Subject
+                    {
+                        Id = reader.GetInt32(0),
+                        Name = reader.GetString(1),
+                        Year = reader.GetInt32(2)
+                    },
+                    Professor = new Professor
+                    {
+                        Id = reader.GetInt32(3),
+                        Name = reader.GetString(4)
+                    },
+                    Group = new Group
+                    {
+                        Id = reader.GetInt32(5),
+                        Name = reader.GetString(6)
+                    }
+                };
+
+                chromosome.Genes.Add(subjectClass);
             }
-            finally
-            {
-                con.Close();
-            }
+
+            return chromosome;
         }
 
         public List<Room> GetRoomsByCollege()
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("GetRoomsByUniversity", con)
             {
-                List<Room> rooms = new List<Room>();
+                CommandType = CommandType.StoredProcedure
+            };
 
-                SqlCommand cmd = new SqlCommand("GetRoomsByUniversity", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@UniversityName", _collegeName);
 
-                SqlParameter name = new SqlParameter("@UniversityName", _collegeName);
-                cmd.Parameters.Add(name);
-                con.Open();
+            con.Open();
 
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+            using var reader = cmd.ExecuteReader();
+            var rooms = new List<Room>();
+
+            while (reader.Read())
+            {
+                var room = new Room
                 {
-                    Room room = new Room();
-                    room.Id = (int)reader[0];
-                    room.Name = reader.GetString(1);
-                    room.Capacity = (int)reader[2];
-                    rooms.Add(room);
-                    //not ready yet, need more code
-                }
-                reader.Close();
-                return rooms;
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Capacity = reader.GetInt32(2)
+                };
+
+                rooms.Add(room);
             }
-            finally
-            {
-                con.Close();
-            }
+
+            return rooms;
         }
-
-
     }
 }

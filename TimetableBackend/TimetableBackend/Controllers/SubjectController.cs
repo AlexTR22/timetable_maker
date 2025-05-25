@@ -15,11 +15,55 @@ namespace TimetableBackend.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200)]
-        public async Task<IActionResult> GetAllSubjects()
+        public ActionResult<IEnumerable<Subject>> GetAll() => _subjectService.GetAllSubjects();
+
+        //[HttpGet("{id:int}")]
+        //public ActionResult<Subject> GetById(int id)
+        //    => _subjectService.GetSubjectById(id) is { } subj ? Ok(subj) : NotFound();
+
+        [HttpPost]
+        public IActionResult Create([FromBody] Subject subject)
         {
-            List<Subject> Subjects = _subjectService.GetAllSubjects();
-            return Ok(Subjects);
+            bool status = _subjectService.AddSubjectInDatabase(subject);
+            if (status)
+            {
+                return NoContent();  
+            }
+            else
+            {
+                return NotFound();   
+            }
         }
+
+        [HttpPut("{id:int}")]
+        public IActionResult Update(int id, [FromBody] Subject subject)
+        {
+
+            bool status = _subjectService.ModifySubjectInDatabase(subject);
+            if (status)
+            {
+                return NoContent();  
+            }
+            else
+            {
+                return NotFound();  
+            }
+        }
+
+        [HttpDelete("{id:int}")]
+        public IActionResult Delete(int id)
+        {
+            bool status = _subjectService.DeleteSubjectInDatabase(id);
+            if (status)
+            {
+                return NoContent();  
+            }
+            else
+            {
+                return NotFound();   
+            }
+        }
+
+
     }
 }

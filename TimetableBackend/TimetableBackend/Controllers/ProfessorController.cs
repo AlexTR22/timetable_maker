@@ -16,13 +16,53 @@ namespace TimetableBackend.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200)]
-        public async Task<IActionResult> GetAllEvents()
+        public ActionResult<IEnumerable<Professor>> GetAll() => _professorService.GetAllProfessors();
+
+        //[HttpGet("{id:int}")]
+        //public ActionResult<Professor> GetById(int id)
+        //    => _professorService.GetProfessorById(id) is { } prof ? Ok(prof) : NotFound();
+
+        [HttpPost]
+        public IActionResult Create([FromBody] Professor professor)
         {
-            List<Professor> professors = _professorService.GetAllProfessors();
-            return Ok(professors);
+            bool status = _professorService.AddProfessorInDatabase(professor);
+            if (status)
+            {
+                return NoContent();  
+            }
+            else
+            {
+                return NotFound();  
+            }
         }
 
+        [HttpPut("{id:int}")]
+        public IActionResult Update(int id, [FromBody] Professor professor)
+        {
+            bool status = _professorService.ModifyProfessorInDatabase(professor);
+            if (status)
+            {
+                return NoContent();  
+            }
+            else
+            {
+                return NotFound();  
+            }
+        }
+
+        [HttpDelete("{id:int}")]
+        public IActionResult Delete(int id)
+        {
+            bool status = _professorService.DeleteProfessorInDatabase(id);
+            if (status)
+            {
+                return NoContent(); 
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
 
     }
 }

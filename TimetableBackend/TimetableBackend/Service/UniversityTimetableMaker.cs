@@ -24,7 +24,7 @@ namespace TimetableBackend.Service
 
         ChromosomeService ChromosomeService { get; set; }
 
-        public UniversityTimetableMaker(int generations,int nrChromosomes, string collegeName, bool semester, Helper helper)
+        public UniversityTimetableMaker(int generations,int nrChromosomes, string collegeName, bool semester, int year, Helper helper)
         {
             _helper = helper;
 
@@ -32,14 +32,14 @@ namespace TimetableBackend.Service
             Generations = generations;
             NrChromosomes = nrChromosomes;
             MutationProbability = 3;
-            ChromosomeService = new ChromosomeService(helper, collegeName, semester);
+            ChromosomeService = new ChromosomeService(helper, collegeName, semester, year);
 
             //_rooms = new List<Room>();
             _rooms= ChromosomeService.GetRoomsByCollege();
 
             if (_population.Count == 0)
             {
-                Chromosome c = ChromosomeService.GetSubjectClaseesByUniversity();
+                Chromosome c = ChromosomeService.GetSubjectClassesByUniversity();
                 _population.Add(c);
             }
 

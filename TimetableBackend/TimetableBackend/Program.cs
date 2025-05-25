@@ -14,7 +14,13 @@ else
     builder.Services.AddSingleton(new Helper(connectionString));
 }
 builder.Services.AddScoped<RoomService>();
-
+builder.Services.AddScoped<SubjectService>();
+builder.Services.AddScoped<ProfessorService>();
+builder.Services.AddScoped<GroupService>();
+builder.Services.AddScoped<TimeConstraintService>();
+builder.Services.AddScoped<CollegeService>();
+builder.Services.AddScoped<UniversityService>();
+builder.Services.AddScoped<UserService>();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -26,20 +32,20 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp", policy =>
     {
         policy.WithOrigins("http://localhost:3000")  // React frontend URL
-            .AllowCredentials()
+            //.AllowCredentials()
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
 });
 
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.Cookie.Name = ".MyApp.Session";
-    options.IdleTimeout = TimeSpan.FromHours(1);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
+//builder.Services.AddDistributedMemoryCache();
+//builder.Services.AddSession(options =>
+//{
+//    options.Cookie.Name = ".MyApp.Session";
+//    options.IdleTimeout = TimeSpan.FromHours(1);
+//    options.Cookie.HttpOnly = true;
+//    options.Cookie.IsEssential = true;
+//});
 
 var app = builder.Build();
 
@@ -52,7 +58,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowReactApp");
 
 //app.UseHttpsRedirection();
-app.UseSession();
+//app.UseSession();
 
 app.UseAuthorization();
 

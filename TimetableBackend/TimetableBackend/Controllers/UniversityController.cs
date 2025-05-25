@@ -6,26 +6,26 @@ namespace TimetableBackend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class GroupController : ControllerBase
+    public class UniversityController : Controller
     {
-        public GroupService _groupService;
+        public UniversityService _universityService;
 
-        public GroupController(GroupService groupService)
+        public UniversityController(UniversityService universityService)
         {
-            _groupService = groupService;
+            _universityService = universityService;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Group>> GetAll() => _groupService.GetAllGroups();
+        public ActionResult<IEnumerable<University>> GetAll() => _universityService.GetAllUniversities();
 
         //[HttpGet("{id:int}")]
-        //public ActionResult<Group> GetById(int id)
-        //    => _groupService.GetGroupById(id) is { } g ? Ok(g) : NotFound();
+        //public ActionResult<University> GetById(int id)
+        //    => _universityService.GetUniversityById(id) is { } uni ? Ok(uni) : NotFound();
 
         [HttpPost]
-        public IActionResult Create([FromBody] Group group)
+        public IActionResult Create([FromBody] University uni)
         {
-            bool status = _groupService.AddGroupInDatabase(group);
+            bool status = _universityService.AddUniversityInDatabase(uni);
             if (status)
             {
                 return NoContent();
@@ -37,9 +37,10 @@ namespace TimetableBackend.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public IActionResult Update(int id, [FromBody] Group group)
+        public IActionResult Update(int id, [FromBody] University uni)
         {
-            bool status = _groupService.ModifyGroupInDatabase(group);
+            if (id != uni.Id) return BadRequest();
+            bool status = _universityService.ModifyUniversityInDatabase(uni);
             if (status)
             {
                 return NoContent();
@@ -53,7 +54,7 @@ namespace TimetableBackend.Controllers
         [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
-            bool status = _groupService.DeleteGroupInDatabase(id);
+            bool status = _universityService.DeleteUniversityInDatabase(id);
             if (status)
             {
                 return NoContent();

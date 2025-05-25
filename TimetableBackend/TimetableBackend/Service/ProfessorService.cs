@@ -1,6 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Data;
-using System.Data.SqlClient;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
 using TimetableBackend.Model;
 
 namespace TimetableBackend.Service
@@ -8,6 +7,7 @@ namespace TimetableBackend.Service
     public class ProfessorService
     {
         private readonly Helper _helper;
+
         public ProfessorService(Helper helper)
         {
             _helper = helper ?? throw new ArgumentNullException(nameof(helper));
@@ -15,132 +15,111 @@ namespace TimetableBackend.Service
 
         public List<Professor> GetAllProfessors()
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("GetAllProfessors", con)
             {
-                List<Professor> result = new List<Professor>();
-                SqlCommand cmd = new SqlCommand("GetAllProfessor", con);
+                CommandType = CommandType.StoredProcedure
+            };
 
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
-                 
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+            con.Open();
+            using var reader = cmd.ExecuteReader();
+            var result = new List<Professor>();
+
+            while (reader.Read())
+            {
+                var professor = new Professor
                 {
-                    Professor professor = new Professor();
-                    professor.Id = (int)reader[0];
-                    professor.Name= reader.GetString(1);
-                    result.Add(professor);
-                }
-                reader.Close();
-                return result;
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    CollegeId= reader.GetInt32(2),
+                };
+                result.Add(professor);
             }
-            finally
-            {
-                con.Close();
-            }
+
+            return result;
         }
 
-        public List<Professor> GetAllProfessorsByCollege(string collegeName)
+        public List<Professor> GetAllProfessorsByCollege(int collegeName)
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("GetAllProfessorsByCollege", con)
             {
-                List<Professor> result = new List<Professor>();
+                CommandType = CommandType.StoredProcedure
+            };
 
-                SqlCommand cmd = new SqlCommand("GetAllProfessorsByCollege", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@Name", collegeName);
 
-                SqlParameter name = new SqlParameter("@name", collegeName);
-                 
-                cmd.Parameters.Add(name);
-                con.Open();
+            con.Open();
+            using var reader = cmd.ExecuteReader();
+            var result = new List<Professor>();
 
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+            while (reader.Read())
+            {
+                var professor = new Professor
                 {
-                    Professor professor = new Professor();
-                    professor.Id = (int)reader[0];
-                    professor.Name = reader.GetString(1);
-                    result.Add(professor);
-                }
-                reader.Close();
-                
-                return result;
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    CollegeId = reader.GetInt32(2),
+                };
+                result.Add(professor);
             }
-            finally
-            {
-                con.Close();
-            }
+
+            return result;
         }
 
-        public void AddProfessorInDatabase(Professor professor)
+        public bool AddProfessorInDatabase(Professor professor)
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("AddProfessor", con)
             {
-                SqlCommand cmd = new SqlCommand("AddProfessor", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+                CommandType = CommandType.StoredProcedure
+            };
 
-                SqlParameter id = new SqlParameter("@id", SqlDbType.Int);
-                SqlParameter name = new SqlParameter("@name", professor.Name);
-                id.Direction = ParameterDirection.Output;
-
-                cmd.Parameters.Add(id);
-                cmd.Parameters.Add(name);
-
-                con.Open();
-                cmd.ExecuteNonQuery();
-
-                professor.Id = (int)id.Value;
-            }
-            finally
+            var idParam = new SqlParameter("@id", SqlDbType.Int)
             {
-                con.Close();
-            }
+                Direction = ParameterDirection.Output
+            };
+
+            cmd.Parameters.Add(idParam);
+            cmd.Parameters.AddWithValue("@Name", professor.Name);
+            cmd.Parameters.AddWithValue("@CollegeId", professor.CollegeId);
+
+            con.Open();
+            int rowsAffected = cmd.ExecuteNonQuery();
+            professor.Id = (int)idParam.Value;
+            return rowsAffected > 0;
         }
 
-        public void ModifyProfessorInDatabase(Professor professor)
+        public bool ModifyProfessorInDatabase(Professor professor)
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("ModifyProfessor", con)
             {
-                SqlCommand cmd = new SqlCommand("ModifyProfessor", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+                CommandType = CommandType.StoredProcedure
+            };
 
-                SqlParameter id = new SqlParameter("@id", professor.Id);
-                SqlParameter name = new SqlParameter("@name", professor.Name);
+            cmd.Parameters.AddWithValue("@Id", professor.Id);
+            cmd.Parameters.AddWithValue("@Name", professor.Name);
+            cmd.Parameters.AddWithValue("@CollegeId", professor.CollegeId);
 
-                cmd.Parameters.Add(id);
-                cmd.Parameters.Add(name);
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-            finally
-            {
-                con.Close();
-            }
+            con.Open();
+            int rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected > 0;
         }
 
-        public void DeleteProfessorInDatabase(int professorId)
+        public bool DeleteProfessorInDatabase(int professorId)
         {
-            SqlConnection con = _helper.Connection;
-            try
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("DeleteProfessor", con)
             {
-                SqlCommand cmd = new SqlCommand("DeleteProfessor", con);
-                cmd.CommandType = CommandType.StoredProcedure;
+                CommandType = CommandType.StoredProcedure
+            };
 
-                SqlParameter id= new SqlParameter("@id", professorId);
-                cmd.Parameters.Add(id);
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-            finally
-            {
-                con.Close();
-            }
+            cmd.Parameters.AddWithValue("@Id", professorId);
+
+            con.Open();
+            int rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected > 0;
         }
-
-
     }
 }

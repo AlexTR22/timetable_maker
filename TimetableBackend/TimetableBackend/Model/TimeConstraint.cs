@@ -5,7 +5,7 @@ namespace TimetableBackend.Model
     public class TimeConstraint
     {
         public int Id {  get; set; }
-        public Professor Professor { get; set; }
+        public int ProfessorID { get; set; }
         public int FromHour {  get; set; }
         public int ToHour { get; set; }
         public int Day { get; set; }
@@ -18,7 +18,7 @@ namespace TimetableBackend.Model
         public TimeConstraint(TimeConstraint other)
         {
             Id = other.Id;
-            Professor = other.Professor;
+            ProfessorID = other.ProfessorID;
             FromHour = other.FromHour; 
             ToHour = other.ToHour;
             Day = other.Day;

@@ -6,26 +6,26 @@ namespace TimetableBackend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class GroupController : ControllerBase
+    public class TimeConstraintsController : ControllerBase
     {
-        public GroupService _groupService;
+        public TimeConstraintService _TCService;
 
-        public GroupController(GroupService groupService)
+        public TimeConstraintsController(TimeConstraintService TCService)
         {
-            _groupService = groupService;
+            _TCService = TCService;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Group>> GetAll() => _groupService.GetAllGroups();
+        public ActionResult<IEnumerable<TimeConstraint>> GetAll() => _TCService.GetAllTimes();
 
         //[HttpGet("{id:int}")]
-        //public ActionResult<Group> GetById(int id)
-        //    => _groupService.GetGroupById(id) is { } g ? Ok(g) : NotFound();
+        //public ActionResult<TimeConstraint> GetById(int id)
+        //    => _TCService.GetTimeConstraintById(id) is { } tc ? Ok(tc) : NotFound();
 
         [HttpPost]
-        public IActionResult Create([FromBody] Group group)
+        public IActionResult Create([FromBody] TimeConstraint tc)
         {
-            bool status = _groupService.AddGroupInDatabase(group);
+            bool status = _TCService.AddTimeConstraintInDatabase(tc);
             if (status)
             {
                 return NoContent();
@@ -37,9 +37,9 @@ namespace TimetableBackend.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public IActionResult Update(int id, [FromBody] Group group)
+        public IActionResult Update(int id, [FromBody] TimeConstraint tc)
         {
-            bool status = _groupService.ModifyGroupInDatabase(group);
+            bool status = _TCService.ModifyTimeConstraintInDatabase(tc);
             if (status)
             {
                 return NoContent();
@@ -53,7 +53,7 @@ namespace TimetableBackend.Controllers
         [HttpDelete("{id:int}")]
         public IActionResult Delete(int id)
         {
-            bool status = _groupService.DeleteGroupInDatabase(id);
+            bool status = _TCService.DeleteTimeConstraintInDatabase(id);
             if (status)
             {
                 return NoContent();
