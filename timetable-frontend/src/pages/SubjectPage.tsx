@@ -1,90 +1,95 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../services/api';
+import { Subject } from '../models/SubjectModel';
+import { AddSubject } from '../components/AddSubject';
+import { EditSubject } from '../components/EditSubject';
+import '../css/DataPage.css'
 
+const SubjectPage: React.FC = () => {
+  const { universityId } = useAuth(); 
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+  const { token } = useAuth();
 
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
 
-function SubjectPage() {
-    //const { universitate } = useParams<{ universitate: string }>();
-    //const [profesori, setProfesori] = useState<Profesor[]>([]);
-    //const [loading, setLoading] = useState(true);
-    //const [error, setError] = useState<string | null>(null);
-    //const [selected, setSelected] = useState<Profesor | null>(null);
-    //const [editing, setEditing] = useState<Profesor | null>(null);
+  const loadSubjects = useCallback(async () => {
+    if (!universityId) { 
+        setSubjects([]);
+        return;
+    }
+    try {
+        const response = await axios.get(`${API_URL}/subject/${universityId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        setSubjects(response.data);
+    } catch (error) {
+        console.error("Error loading subjects:", error);
+    }
+}, [universityId, token]); 
 
-    // Încarcă lista
-    /* useEffect(() => {
-      if (!universitate) return;
-      setLoading(true);
-      api<Profesor[]>(
-        `profesori?universitate=${encodeURIComponent(universitate)}`,
-      )
-        .then(setProfesori)
-        .catch(() => setError("Eroare la încărcarea profesorilor"))
-        .finally(() => setLoading(false));
-    }, [universitate]);
-  
-    
-    const reload = () => {
-      if (!universitate) return;
-      api<Profesor[]>(
-        `profesori?universitate=${encodeURIComponent(universitate)}`,
-      ).then(setProfesori);
-    };
-  
-    const handleSave = async () => {
-      if (!editing) return;
-      const isEdit = Boolean(editing.id);
-      await api<Profesor>(
-        `profesori${isEdit ? `/${editing.id}` : ""}`,
-        isEdit ? "PUT" : "POST",
-        editing,
-      );
-      setEditing(null);
-      setSelected(null);
-      reload();
-    };
-  
-    const handleDelete = async () => {
-      if (!selected?.id) return;
-      if (!window.confirm("Sigur ștergeți profesorul?")) return;
-      await api<void>(`profesori/${selected.id}`, "DELETE");
-      setSelected(null);
-      reload();
-    };
-  
-    if (!universitate) return <p>Lipsește universitatea în URL.</p>; */
+useEffect(() => {
+    loadSubjects();
+}, [loadSubjects]); 
+  const handleDelete = async (id: number) => {
+    await axios.delete(`${API_URL}/subject/${id}`)
+      .catch(error => alert(error));
+    loadSubjects();
+  };
 
-    return (
-        <div style={{ maxWidth: "40rem", margin: "2rem auto" }}>
-            <h2>Materii – { }</h2>
+  return (
+    <div className="data-container">
+      <h2 className="blue-text">Materii</h2>
+      <button onClick={() => setShowAddModal(true)}>Adaugă Materie</button>
 
-            {/* Butoane Add / Edit / Delete */}
-            <div style={{ display: "flex", gap: "0.5rem", margin: "1rem 0" }}>
-                <button /*onClick={ () => setEditing({ nume: "", universitate } )}*/>Add</button>
-                <button
-                /*  onClick={() => selected && setEditing(selected)}
-                 disabled={!selected} */
-                >
-                    Edit
-                </button>
-                <button /*onClick={ handleDelete }  disabled={!selected} */>Delete</button>
-            </div>
+      <ul>
+        {subjects.map((subj) => (
+          <li
+            key={subj.id}
+            className={selectedSubject?.id === subj.id ? 'selected' : ''}
+            onClick={() => setSelectedSubject(subj)}
+          >
+            {subj.name}
+            {selectedSubject?.id === subj.id && (
+              <span className="actions">
+                <button onClick={() => setShowEditModal(true)}>Edit</button>
+                <button onClick={() => handleDelete(subj.id)}>Delete</button>
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
 
-            {/* 
-      
+      {showAddModal && (
+        <AddSubject
+          facultyId={universityId}
+          onClose={() => {
+            setShowAddModal(false);
+            loadSubjects();
+          }}
+        />
+      )}
 
-      
-      {loading ? (<p>Se încarcă...</p>) : error ? ( <p >{error}</p>) :
-       (
-        <div>
-          {subjects.map((p) => (
-            <div key={p.id} onClick={() => setSelected(p)}>
-              {p.nume}
-            </div>
-          ))}
-          {subjects.length === 0 && <p style={{ padding: "1rem" }}>Nu există materii.</p>}
-        </div>
-      )} 
-       */}
-         </div>
-    );
-}
+      {showEditModal && selectedSubject && (
+        <EditSubject
+          subject={selectedSubject}
+          onClose={() => {
+            setShowEditModal(false);
+            loadSubjects();
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
 export default SubjectPage;

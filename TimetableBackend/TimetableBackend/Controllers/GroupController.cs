@@ -18,9 +18,8 @@ namespace TimetableBackend.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Group>> GetAll() => _groupService.GetAllGroups();
 
-        //[HttpGet("{id:int}")]
-        //public ActionResult<Group> GetById(int id)
-        //    => _groupService.GetGroupById(id) is { } g ? Ok(g) : NotFound();
+        [HttpGet("{collegeId:int}")]
+        public ActionResult<IEnumerable<Group>> GetAllGoupsByCollege(int collegeId) => _groupService.GetAllGroupsByCollege(collegeId);
 
         [HttpPost]
         public IActionResult Create([FromBody] Group group)
@@ -63,5 +62,6 @@ namespace TimetableBackend.Controllers
                 return NotFound();
             }
         }
+
     }
 }

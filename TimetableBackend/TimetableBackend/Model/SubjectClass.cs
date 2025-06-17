@@ -4,6 +4,19 @@ namespace TimetableBackend.Model
 {
     public class SubjectClass
     {
+        public Professor Professor { get; set; }
+
+        public Group Group { get; set; }
+
+        public Subject Subject { get; set; }
+
+        public Room Room { get; set; }
+
+        public int Day { get; set; }
+
+        public int Hour { get; set; }
+
+        
         public SubjectClass() 
         {
             Professor = new Professor();
@@ -14,7 +27,7 @@ namespace TimetableBackend.Model
         public SubjectClass(SubjectClass other)
         {
             Professor = new Professor(other.Professor); // Assuming Professor has a copy constructor
-            Duration = other.Duration;
+            
             Group = new Group(other.Group); // Assuming Group has a copy constructor
             Subject = new Subject(other.Subject); // Assuming Subject has a copy constructor
             Room = new Room(other.Room); // Assuming Room has a copy constructor
@@ -22,57 +35,9 @@ namespace TimetableBackend.Model
             Hour = other.Hour;
         }
 
-        private Professor _professor;
-        public Professor Professor
-        {
-            get { return _professor; }
-            set { _professor = value; }
-        }
-        private int _duration;
-        public int Duration
-        {
-            get { return _duration; }
-            set { _duration = value; }
-        }
-
-        private Group _group;
-        public Group Group
-        {
-            get { return _group; }
-            set { _group = value; }
-        }
-
-        private Subject _Subject;
-        public Subject Subject
-        {
-            get { return _Subject; }
-            set { _Subject = value; }
-        }
-
-        private Room _room;
-        public Room Room
-        {
-            get { return _room; }
-            set { _room = value; }
-        }
-
-        private int _day;
-        public int Day
-        {
-            get { return _day; }
-            set { _day = value; }
-        }
-
-        private int _hour;
-        public int Hour
-        {
-            get { return _hour; }
-            set { _hour = value; }
-        }
-
-        //aici o sa fie fals daca oricare dintre campuri se aseamana cu unul din campurile lui obj respectiv
-        //asta rezulta intr-o verificare mai putin amanuntita si deci, care poate sa dea un fitness mai putin exact
-        // !!!!!!!!!! de retinut ca sunt sanse sa necesite o schimbare daca vreau o acuratete mai buna !!!!!!!!!!!!!
+        
+      
+       
         public override bool Equals(object? obj)
         {
             if (obj is SubjectClass SubjectClass2)

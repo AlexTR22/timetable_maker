@@ -34,11 +34,11 @@ namespace TimetableBackend.Service
                 result.Add(new TimeConstraint
                 {
                     Id = reader.GetInt32(0),
-                    ProfessorID = reader.GetInt32(1),
+                    ProfessorId = reader.GetInt32(1),
                     FromHour = reader.GetInt32(2),
                     ToHour = reader.GetInt32(3),
                     Day = reader.GetInt32(4),
-                    College = reader.GetInt32(5)   
+                    CollegeId = reader.GetInt32(5)   
                 });
             }
 
@@ -48,7 +48,7 @@ namespace TimetableBackend.Service
         /* ------------------------------------------------------------------ */
         /*  READ BY COLLEGE                                                   */
         /* ------------------------------------------------------------------ */
-        public List<TimeConstraint> GetAllTimeConstraintsByCollege(string collegeName)
+        public List<TimeConstraint> GetAllTimeConstraintsByCollege(int collegeId)
         {
             var result = new List<TimeConstraint>();
 
@@ -59,8 +59,8 @@ namespace TimetableBackend.Service
             };
 
             cmd.Parameters
-               .Add("@UniversityName", SqlDbType.NVarChar, 100)
-               .Value = collegeName;
+               .Add("@CollegeId", SqlDbType.Int)
+               .Value = collegeId;
 
             con.Open();
             using var reader = cmd.ExecuteReader();
@@ -70,11 +70,11 @@ namespace TimetableBackend.Service
                 result.Add(new TimeConstraint
                 {
                     Id = reader.GetInt32(0),
-                    ProfessorID = reader.GetInt32(1),
+                    ProfessorId = reader.GetInt32(1),
                     FromHour = reader.GetInt32(2),
                     ToHour = reader.GetInt32(3),
                     Day = reader.GetInt32(4),
-                    College = reader.GetInt32(5)
+                    CollegeId = reader.GetInt32(5)
                 });
             }
 
@@ -102,11 +102,11 @@ namespace TimetableBackend.Service
             };
             cmd.Parameters.Add(idParam);
 
-            cmd.Parameters.Add("@ProfessorId", SqlDbType.Int).Value = tc.ProfessorID;
+            cmd.Parameters.Add("@ProfessorId", SqlDbType.Int).Value = tc.ProfessorId;
             cmd.Parameters.Add("@FromHour", SqlDbType.Int).Value = tc.FromHour;
             cmd.Parameters.Add("@ToHour", SqlDbType.Int).Value = tc.ToHour;
             cmd.Parameters.Add("@Day", SqlDbType.Int).Value = tc.Day;
-            cmd.Parameters.Add("@CollegeId", SqlDbType.NVarChar, 100).Value = tc.College;
+            cmd.Parameters.Add("@CollegeId", SqlDbType.Int).Value = tc.CollegeId;
 
             con.Open();
             int rowsAffected = cmd.ExecuteNonQuery();
@@ -130,11 +130,11 @@ namespace TimetableBackend.Service
             };
 
             cmd.Parameters.Add("@Id", SqlDbType.Int).Value = tc.Id;
-            cmd.Parameters.Add("@ProfessorId", SqlDbType.Int).Value = tc.ProfessorID;
+            cmd.Parameters.Add("@ProfessorId", SqlDbType.Int).Value = tc.ProfessorId;
             cmd.Parameters.Add("@FromHour", SqlDbType.Int).Value = tc.FromHour;
             cmd.Parameters.Add("@ToHour", SqlDbType.Int).Value = tc.ToHour;
             cmd.Parameters.Add("@Day", SqlDbType.Int).Value = tc.Day;
-            cmd.Parameters.Add("@CollegeId", SqlDbType.NVarChar, 100).Value = tc.College;
+            cmd.Parameters.Add("@CollegeId", SqlDbType.Int).Value = tc.CollegeId;
 
             con.Open();
             int rowsAffected = cmd.ExecuteNonQuery();

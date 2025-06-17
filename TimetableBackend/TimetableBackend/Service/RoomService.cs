@@ -47,19 +47,19 @@ namespace TimetableBackend.Service
         /* ------------------------------------------------------------------ */
         /*  READ ROOMS BY COLLEGE                                             */
         /* ------------------------------------------------------------------ */
-        public List<Room> GetAllRoomsByCollege(string collegeName)
+        public List<Room> GetAllRoomsByCollege(int collegeId)
         {
             var result = new List<Room>();
 
             using var con = _helper.Connection;
-            using var cmd = new SqlCommand("GetAllRoomsByCollege", con)
+            using var cmd = new SqlCommand("GetRoomsByCollege", con)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
             cmd.Parameters
-               .Add("@Name", SqlDbType.NVarChar, 100)
-               .Value = collegeName;
+               .Add("@CollegeId", SqlDbType.Int)
+               .Value = collegeId;
 
             con.Open();
             using var reader = cmd.ExecuteReader();

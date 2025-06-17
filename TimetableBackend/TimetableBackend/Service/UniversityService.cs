@@ -22,7 +22,7 @@ namespace TimetableBackend.Service
 
             // using-urile asigură eliberarea resurselor fără a mai apela Close()
             using var con = _helper.Connection;
-            using var cmd = new SqlCommand("GetAllUniversitys", con)
+            using var cmd = new SqlCommand("GetAllUniversities", con)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -51,7 +51,7 @@ namespace TimetableBackend.Service
             var result = new List<University>();
 
             using var con = _helper.Connection;
-            using var cmd = new SqlCommand("GetAllUniversitysByCollege", con)
+            using var cmd = new SqlCommand("GetAllUniversitiesByCollege", con)
             {
                 CommandType = CommandType.StoredProcedure
             };

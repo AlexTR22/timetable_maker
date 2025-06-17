@@ -1,90 +1,85 @@
+import React, { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../services/api';
+import { Group } from '../models/GroupModel';
+import { AddGroup } from '../components/AddGroup';
+import { EditGroup } from '../components/EditGroup';
+import "../css/DataPage.css"
 
+const GroupPage: React.FC = () => {
+   const {universityId}=useAuth();
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const { token } = useAuth();
 
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
 
-function GroupPage() {
-    //const { universitate } = useParams<{ universitate: string }>();
-    //const [profesori, setProfesori] = useState<Profesor[]>([]);
-    //const [loading, setLoading] = useState(true);
-    //const [error, setError] = useState<string | null>(null);
-    //const [selected, setSelected] = useState<Profesor | null>(null);
-    //const [editing, setEditing] = useState<Profesor | null>(null);
+  const loadGroups = async () => {
+    await axios.get(`${API_URL}/group/${universityId}`)
+      .then(response => setGroups(response.data))
+      .catch(error => alert(error));
+  };
 
-    // Încarcă lista
-    /* useEffect(() => {
-      if (!universitate) return;
-      setLoading(true);
-      api<Profesor[]>(
-        `profesori?universitate=${encodeURIComponent(universitate)}`,
-      )
-        .then(setProfesori)
-        .catch(() => setError("Eroare la încărcarea profesorilor"))
-        .finally(() => setLoading(false));
-    }, [universitate]);
-  
-    
-    const reload = () => {
-      if (!universitate) return;
-      api<Profesor[]>(
-        `profesori?universitate=${encodeURIComponent(universitate)}`,
-      ).then(setProfesori);
-    };
-  
-    const handleSave = async () => {
-      if (!editing) return;
-      const isEdit = Boolean(editing.id);
-      await api<Profesor>(
-        `profesori${isEdit ? `/${editing.id}` : ""}`,
-        isEdit ? "PUT" : "POST",
-        editing,
-      );
-      setEditing(null);
-      setSelected(null);
-      reload();
-    };
-  
-    const handleDelete = async () => {
-      if (!selected?.id) return;
-      if (!window.confirm("Sigur ștergeți profesorul?")) return;
-      await api<void>(`profesori/${selected.id}`, "DELETE");
-      setSelected(null);
-      reload();
-    };
-  
-    if (!universitate) return <p>Lipsește universitatea în URL.</p>; */
+  useEffect(() => {
+    loadGroups();
+  }, [universityId]);
 
-    return (
-        <div style={{ maxWidth: "40rem", margin: "2rem auto" }}>
-            <h2>Groups – { }</h2>
+  const handleDelete = async (id: number) => {
+    await axios.delete(`${API_URL}/group/${id}`)
+      .catch(error => alert(error));
+    loadGroups();
+  };
 
-            {/* Butoane Add / Edit / Delete */}
-            <div style={{ display: "flex", gap: "0.5rem", margin: "1rem 0" }}>
-                <button /*onClick={ () => setEditing({ nume: "", universitate } )}*/>Add</button>
-                <button
-                /*  onClick={() => selected && setEditing(selected)}
-                 disabled={!selected} */
-                >
-                    Edit
-                </button>
-                <button /*onClick={ handleDelete }  disabled={!selected} */>Delete</button>
-            </div>
+  return (
+    <div className="data-container">
+      <h2 className="blue-text">Grupe</h2>
+      <button onClick={() => setShowAddModal(true)}>Adaugă Grupă</button>
 
-            {/* 
-      
+      <ul>
+        {groups.map((group) => (
+          <li
+            key={group.id}
+            className={selectedGroup?.id === group.id ? 'selected' : ''}
+            onClick={() => setSelectedGroup(group)}
+          >
+            {group.name}
+            {selectedGroup?.id === group.id && (
+              <span className="actions">
+                <button onClick={() => setShowEditModal(true)}>Edit</button>
+                <button onClick={() => handleDelete(group.id)}>Delete</button>
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
 
-      
-      {loading ? (<p>Se încarcă...</p>) : error ? ( <p >{error}</p>) :
-       (
-        <div>
-          {groups.map((p) => (
-            <div key={p.id} onClick={() => setSelected(p)}>
-              {p.nume}
-            </div>
-          ))}
-          {gorups.length === 0 && <p style={{ padding: "1rem" }}>Nu există grupe.</p>}
-        </div>
-      )} 
-       */}
-         </div>
-    );
-}
+      {showAddModal && (
+        <AddGroup
+          facultyId={universityId}
+          onClose={() => {
+            setShowAddModal(false);
+            loadGroups();
+          }}
+        />
+      )}
+
+      {showEditModal && selectedGroup && (
+        <EditGroup
+          group={selectedGroup}
+          onClose={() => {
+            setShowEditModal(false);
+            loadGroups();
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
 export default GroupPage;

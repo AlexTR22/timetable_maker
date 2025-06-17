@@ -33,7 +33,8 @@ namespace TimetableBackend.Service
                     Name = reader.GetString(1),
                     Email = reader.GetString(2),
                     Password = reader.GetString(3),
-                    Role = reader.GetString(4)
+                    Role = reader.GetString(4),
+                    UniversityId = reader.GetInt32(5),
                 };
                 result.Add(user);
             }
@@ -49,7 +50,7 @@ namespace TimetableBackend.Service
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.AddWithValue("@name", uniName);
+            cmd.Parameters.AddWithValue("@Name", uniName);
 
             con.Open();
             using var reader = cmd.ExecuteReader();
@@ -63,7 +64,8 @@ namespace TimetableBackend.Service
                     Name = reader.GetString(1),
                     Email = reader.GetString(2),
                     Password = reader.GetString(3),
-                    Role = reader.GetString(4)
+                    Role = reader.GetString(4),
+                    UniversityId = reader.GetInt32(5),
                 };
                 result.Add(user);
             }
@@ -85,10 +87,11 @@ namespace TimetableBackend.Service
             };
 
             cmd.Parameters.Add(idParam);
-            cmd.Parameters.AddWithValue("@name", user.Name);
-            cmd.Parameters.AddWithValue("@email", user.Email);
-            cmd.Parameters.AddWithValue("@password", user.Password);
-            cmd.Parameters.AddWithValue("@role", user.Role);
+            cmd.Parameters.AddWithValue("@Name", user.Name);
+            cmd.Parameters.AddWithValue("@Email", user.Email);
+            cmd.Parameters.AddWithValue("@Password", user.Password);
+            cmd.Parameters.AddWithValue("@Role", user.Role);
+            cmd.Parameters.AddWithValue("@UniversityId", user.UniversityId);
 
             con.Open();
             int rowsAffected = cmd.ExecuteNonQuery();
@@ -105,11 +108,12 @@ namespace TimetableBackend.Service
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.AddWithValue("@id", user.Id);
-            cmd.Parameters.AddWithValue("@name", user.Name);
-            cmd.Parameters.AddWithValue("@email", user.Email);
-            cmd.Parameters.AddWithValue("@password", user.Password);
-            cmd.Parameters.AddWithValue("@role", user.Role);
+            cmd.Parameters.AddWithValue("@Id", user.Id);
+            cmd.Parameters.AddWithValue("@Name", user.Name);
+            cmd.Parameters.AddWithValue("@Email", user.Email);
+            cmd.Parameters.AddWithValue("@Password", user.Password);
+            cmd.Parameters.AddWithValue("@Role", user.Role);
+            cmd.Parameters.AddWithValue("@UniversityId", user.UniversityId);
 
             con.Open();
             int rowsAffected = cmd.ExecuteNonQuery();
@@ -124,11 +128,42 @@ namespace TimetableBackend.Service
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.AddWithValue("@id", userId);
+            cmd.Parameters.AddWithValue("@Id", userId);
 
             con.Open();
             int rowsAffected = cmd.ExecuteNonQuery();
             return rowsAffected > 0;
+        }
+
+        public User ValidateUser(string username, string password, string email)
+        {
+            using var con = _helper.Connection;
+            using var cmd = new SqlCommand("dbo.ValidateUser", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("@Username", username);
+            cmd.Parameters.AddWithValue("@Password", password);
+            cmd.Parameters.AddWithValue("@Email", email);
+
+            con.Open();
+            using var reader = cmd.ExecuteReader();
+
+            if (reader.Read())
+            {
+                return new User
+                {
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Email = reader.GetString(2),
+                    Password = reader.GetString(3),
+                    Role = reader.GetString(4),
+                    UniversityId = reader.GetInt32(5),
+                };
+            }
+            else
+            {
+                return null; // User invalid
+            }
         }
     }
 }

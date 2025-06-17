@@ -6,15 +6,17 @@
         public string Name { get; set; }
         public int Year { get; set; }
         public int CollegeId { get; set; }
-        public Group()
-        {
-        }
+       
         public Group(Group other)
         {
             Id = other.Id;
             Name = other.Name;
             Year = other.Year;
             CollegeId = other.CollegeId;
+        }
+
+        public Group()
+        {
         }
     }
 }

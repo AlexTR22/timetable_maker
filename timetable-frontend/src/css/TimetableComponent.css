@@ -1,65 +1,78 @@
 .timetable-container {
-    padding: 1rem;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  
-  .timetable-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    text-align: center;
-    user-select: none;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  user-select: none;
+}
+
+.timetable-title {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 0.5rem;
+}
+
+.timetable-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); 
+  gap: 1px;
+  background-color: #ccc;
+  border: 1px solid #ccc;
+  overflow-x: auto;
+}
+
+.header-cell {
+  background-color: #eb6d6d;
+  color: white;
+  padding: 0.75rem;
+  text-align: center;
+  font-weight: bold;
+  border-right: 1px solid #bbb;
+}
+
+.time-cell {
+  background-color: #ecf0f1;
+  text-align: center;
+  padding: 1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.timetable-cell {
+  background-color: white;
+  padding: 0.5rem;
+  text-align: center;
+  border: 1px solid #eee;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: black;
+}
+
+.timetable-cell .classroom {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* Stiluri pentru ecrane mai mici */
+@media (max-width: 768px) {
   .timetable-grid {
-    display: grid;
-    grid-template-columns: 100px repeat(5, 1fr);
-    border: 1px solid #ccc;
+    font-size: 0.75rem;
+    grid-template-columns: repeat(6, 150px);
   }
-  
-  .header-cell {
-    background-color: #f3f3f3;
-    border: 1px solid #ccc;
-    padding: 0.5rem;
-    font-weight: 600;
-    text-align: center;
-    color: black; /* Add this line */
-    user-select: none;
-  }
-  
-  .time-cell {
 
-    border: 1px solid #ccc;
-    text-align: center;
-    justify-content: center;
-    padding: 0.5rem;
-    font-weight: 500;
-    user-select: none;
-    color: red; 
+  .timetable-title {
+    font-size: 1.3rem;
   }
-  .time-cell p{
-    width:auto;
-    height: auto;
-  }
+
   .timetable-cell {
-    border: 1px solid #ccc;
-    padding: 0.5rem;
-    text-align: center;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    width: 160px;
-    height: 80px;
+    min-height: 60px;
   }
-  
-  .timetable-cell:hover {
-    background-color: #e0f0ff;
-  }
-
-  .classroom {
-    font-size: 0.9rem;
-    color: #555;
-    font-style: italic;
-  }
-  
+}

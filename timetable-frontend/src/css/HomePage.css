@@ -1,0 +1,62 @@
+/* Home.css */
+
+/* Oprește selectarea textului */
+* {
+  user-select: none;
+}
+
+/* Container general */
+.home-container {
+  height: 100vh; 
+  width: 100vw;  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  background-color: #f9f9f9;
+  padding: 2rem;
+  box-sizing: border-box; 
+}
+
+/* Titlu */
+.home-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Grid de butoane */
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Stil butoane */
+.home-button {
+  padding: 1rem 1.5rem;
+  background-color: #eb6d6d;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.home-button:hover {
+  background-color: #dd4a4a;
+  transform: scale(1.03);
+}
+
+.home-footer p{
+  color:black;
+}
+.home-footer a{
+  text-decoration: none;
+  color: white; 
+}

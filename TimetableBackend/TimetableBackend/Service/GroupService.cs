@@ -47,7 +47,7 @@ namespace TimetableBackend.Service
         /* ------------------------------------------------------------------ */
         /*  READ GROUPS BY COLLEGE                                            */
         /* ------------------------------------------------------------------ */
-        public List<Group> GetAllGroupsByCollege(string collegeName)
+        public List<Group> GetAllGroupsByCollege(int collegeId)
         {
             var result = new List<Group>();
 
@@ -59,8 +59,8 @@ namespace TimetableBackend.Service
 
             // Evităm AddWithValue—specificăm explicit tipul și dimensiunea
             cmd.Parameters
-               .Add("@Name", SqlDbType.NVarChar, 100)
-               .Value = collegeName;
+               .Add("@CollegeId", SqlDbType.Int)
+               .Value = collegeId;
 
             con.Open();
             using var reader = cmd.ExecuteReader();

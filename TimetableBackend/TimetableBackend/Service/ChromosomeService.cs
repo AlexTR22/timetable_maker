@@ -7,14 +7,14 @@ namespace TimetableBackend.Service
     public class ChromosomeService
     {
         private readonly Helper _helper;
-        private readonly string _collegeName;
+        private readonly int _collegeId;
         private readonly bool _semester;
         private readonly int _year;
 
-        public ChromosomeService(Helper helper, string collegeName, bool semester,int year)
+        public ChromosomeService(Helper helper, int collegeId, bool semester,int year)
         {
             _helper = helper ?? throw new ArgumentNullException(nameof(helper));
-            _collegeName = collegeName;
+            _collegeId = collegeId;
             _semester = semester;
             _year = year;
         }
@@ -27,9 +27,9 @@ namespace TimetableBackend.Service
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.AddWithValue("@CollegeName", _collegeName);
-            cmd.Parameters.AddWithValue("@Year", _year);  // momentan fix, modifici după ce dorești
-            cmd.Parameters.AddWithValue("@Semester", _semester);
+            cmd.Parameters.AddWithValue("@CollegeId", _collegeId);
+            cmd.Parameters.AddWithValue("@Year", 1);  // momentan fix, modifici după ce dorești
+            cmd.Parameters.AddWithValue("@Semester", false);
 
             con.Open();
 
@@ -64,15 +64,15 @@ namespace TimetableBackend.Service
             return chromosome;
         }
 
-        public List<Room> GetRoomsByCollege()
+        public List<Room> GetRoomsByCollege(int id)
         {
             using var con = _helper.Connection;
-            using var cmd = new SqlCommand("GetRoomsByUniversity", con)
+            using var cmd = new SqlCommand("GetRoomsByCollege", con)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.AddWithValue("@UniversityName", _collegeName);
+            cmd.Parameters.AddWithValue("@CollegeId", id);
 
             con.Open();
 
@@ -93,5 +93,6 @@ namespace TimetableBackend.Service
 
             return rooms;
         }
+
     }
 }

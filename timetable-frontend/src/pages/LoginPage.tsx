@@ -3,7 +3,10 @@ import { useState } from "react";
 import "../css/LoginPage.css";
 import { useNavigate } from 'react-router-dom';
 
-import { useSession } from "../context/SessionProvider";
+import axiosApi from '../services/axiosInstance';
+import { useAuth } from '../context/AuthContext';
+import { API_URL } from "../services/api";
+import axios from "axios";
 
 function LoginPage()
 {
@@ -13,15 +16,21 @@ function LoginPage()
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    
-    const { login } = useSession();
-    //const { user } = useSession();
 
+    const { login } = useAuth();
+    const { role } = useAuth();
+    
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            
-            const response = await fetch('http://localhost:5000/login', {
+            const res = await axios.post(`${API_URL}/authentification/login`, { email, username, password });
+            if(res.data.token as string!=null)
+            {
+                login(res.data.token as string, res.data.universityId as number);
+                navigate('/homePage');
+            }
+
+            /* const response = await fetch('http://localhost:5000/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password })
@@ -35,11 +44,12 @@ function LoginPage()
             {
                 login(data);
                 navigate(`/mainpPage`);
-            }
+            } */
            
         }
         catch (error) {
-            throw(error);
+            setError("Nume, Email sau Parola incorectă!");
+            
         }
     };
 
@@ -68,10 +78,10 @@ function LoginPage()
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                {error && <p style={{ color: "red", fontWeight: "bold" }}>{error}</p>}
                 <button type="submit">Login</button>
-                <label> - or -</label>
-                <button onClick={() => navigate("/register")}>Signin</button>
+                 {error && <p style={{ color: "red", fontWeight: "bold" }}>{error}</p>}
+               {/* <label> - or -</label>
+                <button onClick={() => navigate("/register")}>Signin</button> */}
             </form>
         </div>
     );

@@ -1,17 +1,28 @@
 //import React from "react";
+import { Navigate } from "react-router-dom";
 import TimetableComponent from "../components/TimetableComponent";
+import { useAuth } from "../context/AuthContext";
+import '../css/TimetablePage.css'
+import { useState } from "react";
+
+function TimetablePage() {
+  const { universityId } = useAuth();
+  const { token } = useAuth();
+  const [startGenerating, setStartGenerating] = useState(false);
 
 
-function TimetablePage()  {
-  
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold text-center mb-8">University Timetables</h1>
-
-      <div>
-        <TimetableComponent/>
-      </div>
+    <div className="timetable-page">
+      <h1>Orar </h1>
+      {!startGenerating&& (<button onClick={() => setStartGenerating(true)}> Porneste generare </button>)}
+       {startGenerating && (
+         <TimetableComponent facultyId={universityId} />
+              
+            )}
     </div>
   );
 };

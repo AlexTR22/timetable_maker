@@ -1,0 +1,17 @@
+.timetable-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 99vw;  
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+.timetable-page h1 {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  
+  text-align: center;
+}
+

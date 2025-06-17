@@ -13,17 +13,21 @@ namespace TimetableBackend.Controllers
 
       
         private UniversityTimetableMaker _timetableMaker;
+        private TimeConstraintService _timeConstraintService;
         private Helper _helper;
-        public TimetableController(Helper helper)
+
+        public TimetableController(Helper helper,TimeConstraintService timeConstraintService)
         {
             _helper = helper ?? throw new ArgumentNullException(nameof(helper));
             _chromosomeToTimetable = new ChromosomeToTimetable();
+            _timeConstraintService = timeConstraintService;
         }
-        [HttpGet]
+        [HttpGet("{collegeId}")]
         [ProducesResponseType(200)]
-        public async Task<IActionResult> GetTimetable()
+        public async Task<IActionResult> GetTimetable(int collegeId)
         {
-            _timetableMaker = new UniversityTimetableMaker(100, 2, "FMI",false,3,_helper);
+            _timetableMaker = new UniversityTimetableMaker(100,4, collegeId, false,3,_helper,_timeConstraintService);
+
             Chromosome chromosome = _timetableMaker.Run();
             List<GroupTimetable> groupsTimetable = new List<GroupTimetable>();
             groupsTimetable = _chromosomeToTimetable.GetTimetableForFrontend(chromosome.Genes);

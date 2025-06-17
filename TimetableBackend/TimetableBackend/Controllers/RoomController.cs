@@ -18,6 +18,8 @@ namespace TimetableBackend.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Room>> GetAllRooms() => _roomsService.GetAllRooms();
 
+        [HttpGet("{collegeId:int}")]
+        public ActionResult<IEnumerable<Room>> GetAllRoomsByCollege(int collegeId) => _roomsService.GetAllRoomsByCollege(collegeId);
         //[HttpGet("{id:int}")]
         //public ActionResult<Room> GetById(int id)
         //    => _roomsService.GetRoomById(id) is { } room ? Ok(room) : NotFound();

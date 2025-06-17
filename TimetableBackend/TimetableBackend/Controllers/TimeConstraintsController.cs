@@ -18,11 +18,13 @@ namespace TimetableBackend.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<TimeConstraint>> GetAll() => _TCService.GetAllTimes();
 
+        [HttpGet("{collegeId:int}")]
+        public ActionResult<IEnumerable<TimeConstraint>> GetAllTimeConstraintsByCollege(int collegeId) => _TCService.GetAllTimeConstraintsByCollege(collegeId);
         //[HttpGet("{id:int}")]
         //public ActionResult<TimeConstraint> GetById(int id)
         //    => _TCService.GetTimeConstraintById(id) is { } tc ? Ok(tc) : NotFound();
 
-        [HttpPost]
+        [HttpPost]  
         public IActionResult Create([FromBody] TimeConstraint tc)
         {
             bool status = _TCService.AddTimeConstraintInDatabase(tc);

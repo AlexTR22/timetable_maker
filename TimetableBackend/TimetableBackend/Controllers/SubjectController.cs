@@ -17,6 +17,8 @@ namespace TimetableBackend.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Subject>> GetAll() => _subjectService.GetAllSubjects();
 
+        [HttpGet("{collegeId:int}")]
+        public ActionResult<IEnumerable<Subject>> GetAllSubjectsByCollege(int collegeId) => _subjectService.GetAllSubjectsByCollege(collegeId);
         //[HttpGet("{id:int}")]
         //public ActionResult<Subject> GetById(int id)
         //    => _subjectService.GetSubjectById(id) is { } subj ? Ok(subj) : NotFound();
@@ -24,8 +26,9 @@ namespace TimetableBackend.Controllers
         [HttpPost]
         public IActionResult Create([FromBody] Subject subject)
         {
+            //Console.WriteLine(subject.IdCollege);
             bool status = _subjectService.AddSubjectInDatabase(subject);
-            if (status)
+            if (status) 
             {
                 return NoContent();  
             }

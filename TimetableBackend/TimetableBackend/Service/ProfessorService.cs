@@ -39,7 +39,7 @@ namespace TimetableBackend.Service
             return result;
         }
 
-        public List<Professor> GetAllProfessorsByCollege(int collegeName)
+        public List<Professor> GetAllProfessorsByCollege(int collegeId)
         {
             using var con = _helper.Connection;
             using var cmd = new SqlCommand("GetAllProfessorsByCollege", con)
@@ -47,7 +47,7 @@ namespace TimetableBackend.Service
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.AddWithValue("@Name", collegeName);
+            cmd.Parameters.AddWithValue("@CollegeId", collegeId);
 
             con.Open();
             using var reader = cmd.ExecuteReader();
@@ -120,6 +120,54 @@ namespace TimetableBackend.Service
             con.Open();
             int rowsAffected = cmd.ExecuteNonQuery();
             return rowsAffected > 0;
+        }
+
+        public int GetProfessorIdByName(string name)
+        {
+            using var con = _helper.Connection;
+
+            using var cmd = new SqlCommand("GetProfessorIdByName", con)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            
+            cmd.Parameters.AddWithValue("@Name", name);
+            int id = 0;
+            con.Open();
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                id = reader.GetInt32(0);
+            }
+            return id;
+        }
+
+        public Professor GetProfessorById(int id)
+        {
+            using var con = _helper.Connection;
+
+            using var cmd = new SqlCommand("GetProfessorById", con)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            cmd.Parameters.AddWithValue("@Id", id);
+            
+            con.Open();
+            using var reader = cmd.ExecuteReader();
+            Professor result= null;
+            while (reader.Read())
+            {
+                var professor = new Professor
+                {
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    CollegeId = reader.GetInt32(2),
+                };
+                result= new Professor(professor);
+
+            }
+            return result;
         }
     }
 }

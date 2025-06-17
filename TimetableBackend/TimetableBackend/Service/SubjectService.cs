@@ -33,8 +33,8 @@ namespace TimetableBackend.Service
                     Name = reader.GetString(1),
                     Year = reader.GetInt32(2),
                     Semester = reader.GetBoolean(3),
-                    IdProfessor = reader.GetInt32(4),
-                    IdCollege = reader.GetInt32(5),
+                    ProfessorId = reader.GetInt32(4),
+                    CollegeId = reader.GetInt32(5),
                 };
                 result.Add(subject);
             }
@@ -42,15 +42,15 @@ namespace TimetableBackend.Service
             return result;
         }
 
-        public List<Subject> GetAllSubjectsByCollege(string collegeName)
+        public List<Subject> GetAllSubjectsByCollege(int collegeId)
         {
             using var con = _helper.Connection;
-            using var cmd = new SqlCommand("GetAllSubjectsByCollege", con)
+            using var cmd = new SqlCommand("GetSubjectsByCollege", con)
             {
                 CommandType = CommandType.StoredProcedure
             };
 
-            cmd.Parameters.AddWithValue("@Name", collegeName);
+            cmd.Parameters.AddWithValue("@CollegeId", collegeId);
 
             con.Open();
             using var reader = cmd.ExecuteReader();
@@ -64,8 +64,8 @@ namespace TimetableBackend.Service
                     Name = reader.GetString(1),
                     Year = reader.GetInt32(2),
                     Semester = reader.GetBoolean(3),
-                    IdProfessor = reader.GetInt32(4),
-                    IdCollege = reader.GetInt32(5),
+                    ProfessorId = reader.GetInt32(4),
+                    CollegeId = reader.GetInt32(5),
                 };
                 result.Add(subject);
             }
@@ -89,9 +89,9 @@ namespace TimetableBackend.Service
             cmd.Parameters.Add(idParam);
             cmd.Parameters.AddWithValue("@Name", subject.Name);
             cmd.Parameters.AddWithValue("@Year", subject.Year);
-            cmd.Parameters.AddWithValue("@CollegeId", subject.IdCollege);
-            cmd.Parameters.AddWithValue("@ProfessorId", subject.IdProfessor);
-            cmd.Parameters.AddWithValue("@Semester", subject.Semester);
+            cmd.Parameters.AddWithValue("@CollegeId", subject.CollegeId);
+            cmd.Parameters.AddWithValue("@ProfessorId", subject.ProfessorId);
+            cmd.Parameters.AddWithValue("@Semester", false);
 
             con.Open();
             int rowsAffected = cmd.ExecuteNonQuery();
@@ -110,9 +110,9 @@ namespace TimetableBackend.Service
             cmd.Parameters.AddWithValue("@Id", subject.Id);
             cmd.Parameters.AddWithValue("@Name", subject.Name);
             cmd.Parameters.AddWithValue("@Year", subject.Year);
-            cmd.Parameters.AddWithValue("@CollegeId", subject.IdCollege);
-            cmd.Parameters.AddWithValue("@ProfessorId", subject.IdProfessor);
-            cmd.Parameters.AddWithValue("@Semester", subject.Semester);
+            cmd.Parameters.AddWithValue("@CollegeId", subject.CollegeId);
+            cmd.Parameters.AddWithValue("@ProfessorId", subject.ProfessorId);
+            cmd.Parameters.AddWithValue("@Semester", false);
 
             con.Open();
             int rowsAffected = cmd.ExecuteNonQuery();
@@ -133,5 +133,8 @@ namespace TimetableBackend.Service
             int rowsAffected = cmd.ExecuteNonQuery();
             return rowsAffected > 0;
         }
+
+      
+
     }
 }
