@@ -167,10 +167,7 @@ const TimetableComponent: React.FC<TimetableProps> = ({ facultyId }) => {
           // Am schimbat div-ul exterior cu li pentru coerență semantică, presupunând că timetable-container este un ul
           // Dacă timetable-container nu este ul, poți păstra div
           <div key={groupTimetable.groupName} className="group-timetable-item">
-            <h2 className="timetable-title"> {groupTimetable.groupName === "[Toate Grupele]" // Am presupus că așa ai numit placeholder-ul
-              ? `Curs Comun - ${groupTimetable.groupName}` // Ce vrei să afișezi pentru curs comun
-              : groupTimetable.groupName // Ce vrei să afișezi pentru grupe specifice
-            }</h2>
+            <h2 className="timetable-title"> {groupTimetable.groupName}</h2>
             <div className="timetable-grid">
               {/* Header Row */}
               <div className="header-cell"></div> {/* Colț gol */}
@@ -201,7 +198,7 @@ const TimetableComponent: React.FC<TimetableProps> = ({ facultyId }) => {
                             <div className="classroom">{slot.room}</div>
                           </>
                         ) : (
-                          <div style={{ opacity: 0.5 }}>—</div>
+                          <div>—</div>
                         )}
                       </div>
                     );
